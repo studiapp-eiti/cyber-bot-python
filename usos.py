@@ -1,4 +1,5 @@
 import rauth
+import os
 
 
 class USOS_Connection:
@@ -36,7 +37,12 @@ class USOS_Connection:
     def _obtain_api_key(self) -> tuple:
         key = ''
         secret = ''
-        with open('usos_cred') as f:
+        
+        usos_key_file_var = 'USOS_API_KEY_FILE'
+        if usos_key_file_var not in os.environ.keys():
+            raise OSError('Variable ' + usos_key_file_var + ' not set!')
+        
+        with open(os.environ[usos_key_file_var]) as f:
             key, secret = f.read().split('\n')
         return key, secret
 
