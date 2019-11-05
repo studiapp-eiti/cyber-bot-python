@@ -35,16 +35,13 @@ class USOS_Connection:
 
 
     def _obtain_api_key(self) -> tuple:
-        key = ''
-        secret = ''
-        
-        usos_key_file_var = 'USOS_API_KEY_FILE'
-        if usos_key_file_var not in os.environ.keys():
-            raise OSError('Variable ' + usos_key_file_var + ' not set!')
-        
-        with open(os.environ[usos_key_file_var]) as f:
-            key, secret = f.read().split('\n')
-        return key, secret
+        client_id_var = 'USOS_API_CLIENT_ID'
+        client_secret_var = 'USOS_API_CLIENT_SECRET'
+
+        if client_id_var not in os.environ.keys() or client_secret_var not in os.environ.keys():
+            raise OSError('USOS API Client credentials not set in system environment')
+            
+        return os.environ[client_id_var], os.environ[client_secret_var]
 
 
     def get_class_schedule(self, days: int):
