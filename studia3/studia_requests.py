@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 import lxml
 import json
 import datetime
+import time
+
+
 class Studia3Client:
     BASE_URL = "https://studia3.elka.pw.edu.pl/"
     SID_URL = "en/19Z/-/login/"
@@ -33,12 +36,20 @@ class Studia3Client:
     #         return True
     #     raise ValueError("Please provide valid username and password!")
 
-    def is_logged_in(self):
-        cookies = {"STUDIA_SID": self.cookie+"", "STUDIA_COOKIES": "YES"}
-        try:
-            response = requests.get(self.URL_REFRESH_SESSION, cookies=cookies, timeout=5)
-        except Exception:
-            print("Request took too long")
+    def is_logged_in(self, times=1, delay=0):
+        cookies = {"STUDIA_SID": self.cookie + "", "STUDIA_COOKIES": "YES"}
+        status = None
+        for i in range(0, times):
+            try:
+                response = requests.get(self.URL_REFRESH_SESSION, cookies=cookies, timeout=5)
+                status = True
+                break
+            except Exception:
+                print("Request took too long")
+                time.sleep(delay)
+                status = None
+
+        if status is None:
             return None
         parameters = json.loads(response.text, encoding="UTF-8")
         if len(parameters["time"]) == 0:

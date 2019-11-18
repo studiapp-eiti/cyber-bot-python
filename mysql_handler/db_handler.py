@@ -10,7 +10,7 @@ class Db:
         credentials = self.get_credentials()
         self.db = mysql.connector.connect(host="localhost", user=credentials["username"],
                                           passwd=credentials["password"], database=credentials["db"])
-        self.cursor = self.db.cursor()
+        self.cursor = self.db.cursor(dictionary=True)
 
     def get_cookies(self):
         self.cursor.execute('SELECT maintainer_id, cookie, expires FROM studia3_sessions')
