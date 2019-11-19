@@ -49,9 +49,9 @@ class Studia3Client:
                 time.sleep(delay)
                 status = None
 
-        if status is None:
-            return None
-        parameters = json.loads(response.text, encoding="UTF-8")
-        if len(parameters["time"]) == 0:
-            return None
-        return parameters["end"]
+        if status is True:
+            parameters = json.loads(response.text, encoding="UTF-8")
+            if len(parameters["time"]) == 0:
+                return False
+            return parameters["end"]
+        return None

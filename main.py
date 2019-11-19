@@ -11,17 +11,22 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-file_handler = logging.FileHandler('sample1.log')
+file_handler = logging.FileHandler('sample2.log')
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
+streamHandler = logging.StreamHandler()
+streamHandler.setLevel(logging.DEBUG)
+streamHandler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
-
+logger.addHandler(streamHandler)
+l = [1,2]
 logger.debug("this is a debugging message")
 logger.info("this is an informational message")
 logger.warning("this is a warning message")
 logger.error("this is an error message")
-logger.critical("this is a critical messageg")
+logger.critical(f"this is a critical messageg {l}")
+
 # if __name__ == "__main__":
 #     database = db_handler.Db()
 #     maintainer_objects = database.get_cookies()
