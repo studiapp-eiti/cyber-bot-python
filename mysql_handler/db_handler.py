@@ -3,13 +3,16 @@ from mysql.connector.cursor import MySQLCursorPrepared
 import os
 import json
 import datetime
+from dotenv import load_dotenv
+from pathlib import Path
+
 
 
 class Db:
     def __init__(self):
-        credentials = self.get_credentials()
-        self.db = mysql.connector.connect(host="localhost", user=credentials["username"],
-                                          passwd=credentials["password"], database=credentials["db"])
+        self.get_credentials()
+        self.db = mysql.connector.connect(host=os.getenv("DB_HOST"), user=os.getenv("DB_USER"),
+                                          passwd=os.getenv("DB_PASSWD"), database=os.getenv("DB_NAME"))
         self.cursor = self.db.cursor(dictionary=True)
 
     def get_cookies(self):
@@ -34,11 +37,8 @@ class Db:
     def mysql_dt_format(timestamp):
         dt = datetime.datetime.fromtimestamp(timestamp)
 
-    @classmethod
-    def get_credentials(cls):
-        full_path = os.path.realpath(__file__)
-        path, _ = os.path.split(full_path)
-        credentials = None
-        with open(path + "/../.env/credentials.json") as f:
-            credentials = json.load(f)
-        return credentials["mysql"]
+    @staticmethod
+    def get_credentials():
+        env_path = Path("..") / ".env"
+        load_dotenv(dotenv_path=env_path)
+
