@@ -1,5 +1,6 @@
 import mysql.connector
 import os
+from usos.user import User
 
 
 class USOSMySQLConnector:
@@ -15,42 +16,42 @@ class USOSMySQLConnector:
     TBL_USERS = 'users'
     COL_USOS_TOKEN = 'usos_token'
     COL_USOS_TOKEN_SECRET = 'usos_token_secret'
+    COL_USOS_LOCALE = 'locale'
 
     def __init__(self):
         """Setup connection with MySQL database"""
-        if USOSMySQLConnector.DB_NAME_VARNAME not in os.environ.keys() \
-                or USOSMySQLConnector.DB_USER_VARNAME not in os.environ.keys() \
-                or USOSMySQLConnector.DB_PASSWD_VARNAME not in os.environ.keys() \
-                or USOSMySQLConnector.DB_HOST_VARNAME not in os.environ.keys():
+        if self.DB_NAME_VARNAME not in os.environ.keys() \
+                or self.DB_USER_VARNAME not in os.environ.keys() \
+                or self.DB_PASSWD_VARNAME not in os.environ.keys() \
+                or self.DB_HOST_VARNAME not in os.environ.keys():
             raise OSError('Database-related environment variables not set')
 
         # TODO: Check for errors during connecting to the database
         self._connector = mysql.connector.connect(
-            user=os.getenv(USOSMySQLConnector.DB_USER_VARNAME),
-            password=os.getenv(USOSMySQLConnector.DB_PASSWD_VARNAME),
-            host=os.getenv(USOSMySQLConnector.DB_HOST_VARNAME),
-            database=os.getenv(USOSMySQLConnector.DB_NAME_VARNAME)
+            user=os.getenv(self.DB_USER_VARNAME),
+            password=os.getenv(self.DB_PASSWD_VARNAME),
+            host=os.getenv(self.DB_HOST_VARNAME),
+            database=os.getenv(self.DB_NAME_VARNAME)
         )
 
-    def get_usos_tokens(self) -> list:
-        """Get all users' tokens from databse
+    def get_usos_users(self) -> list:
+        """Get all users' tokens, secrets and locale
 
-        Tokens are returned in a list containing dictionaries in following format:
-        {'token': usertoken, 'secret': usersecret}
+        Returns a list of `User` objects
         """
-        query = 'select {}, {} from {};'.format(USOSMySQLConnector.COL_USOS_TOKEN,
-                                                USOSMySQLConnector.COL_USOS_TOKEN_SECRET,
-                                                USOSMySQLConnector.TBL_USERS)
-        usos_tokens = []
+        query = 'select {}, {}, {} from {};'.format(self.COL_USOS_TOKEN,
+                                                    self.COL_USOS_TOKEN_SECRET,
+                                                    self.COL_USOS_LOCALE,
+                                                    self.TBL_USERS)
+        users = []
 
         cursor = self._connector.cursor()
-        # TODO: Check for errors during executing the query
         cursor.execute(query)
-        for (usos_token, usos_token_secret) in cursor:
-            usos_tokens.append({'token': usos_token, 'secret': usos_token_secret})
+        for (usos_token, usos_token_secret, locale) in cursor:
+            users.append(User(usos_token, usos_token_secret, locale))
         cursor.close()
 
-        return usos_tokens
+        return users
 
     def close_connection(self):
         """Close connection with database"""
