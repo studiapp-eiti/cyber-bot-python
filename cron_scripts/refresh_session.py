@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-file_handler = logging.FileHandler('/var/www/python/cron_scripts/refresh_session_1.log')
+file_handler = logging.FileHandler('/var/log/cyber_bot/refresh_session_1.log')
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
 
@@ -48,6 +48,7 @@ if __name__ == "__main__":
                 elif new_exp_date is not None:
                     database.update_cookies(m_id, new_exp_date)
                     if i+1 < len(maintainers):
+                        # pass
                         time.sleep(random.randrange(5, 30))
                 else:
                     logger.warning("Timeout occurred!")
