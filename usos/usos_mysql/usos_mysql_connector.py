@@ -20,18 +20,18 @@ class USOSMySQLConnector:
 
     def __init__(self):
         """Setup connection with MySQL database"""
-        if self.DB_NAME_VARNAME not in os.environ.keys() \
-                or self.DB_USER_VARNAME not in os.environ.keys() \
-                or self.DB_PASSWD_VARNAME not in os.environ.keys() \
-                or self.DB_HOST_VARNAME not in os.environ.keys():
+        if USOSMySQLConnector.DB_NAME_VARNAME not in os.environ.keys() \
+                or USOSMySQLConnector.DB_USER_VARNAME not in os.environ.keys() \
+                or USOSMySQLConnector.DB_PASSWD_VARNAME not in os.environ.keys() \
+                or USOSMySQLConnector.DB_HOST_VARNAME not in os.environ.keys():
             raise OSError('Database-related environment variables not set')
 
         # TODO: Check for errors during connecting to the database
         self._connector = mysql.connector.connect(
-            user=os.getenv(self.DB_USER_VARNAME),
-            password=os.getenv(self.DB_PASSWD_VARNAME),
-            host=os.getenv(self.DB_HOST_VARNAME),
-            database=os.getenv(self.DB_NAME_VARNAME)
+            user=os.getenv(USOSMySQLConnector.DB_USER_VARNAME),
+            password=os.getenv(USOSMySQLConnector.DB_PASSWD_VARNAME),
+            host=os.getenv(USOSMySQLConnector.DB_HOST_VARNAME),
+            database=os.getenv(USOSMySQLConnector.DB_NAME_VARNAME)
         )
 
     def get_usos_users(self) -> list:
@@ -39,10 +39,10 @@ class USOSMySQLConnector:
 
         Returns a list of `User` objects
         """
-        query = 'select {}, {}, {} from {};'.format(self.COL_USOS_TOKEN,
-                                                    self.COL_USOS_TOKEN_SECRET,
-                                                    self.COL_USOS_LOCALE,
-                                                    self.TBL_USERS)
+        query = 'select {}, {}, {} from {};'.format(USOSMySQLConnector.COL_USOS_TOKEN,
+                                                    USOSMySQLConnector.COL_USOS_TOKEN_SECRET,
+                                                    USOSMySQLConnector.COL_USOS_LOCALE,
+                                                    USOSMySQLConnector.TBL_USERS)
         users = []
 
         cursor = self._connector.cursor()

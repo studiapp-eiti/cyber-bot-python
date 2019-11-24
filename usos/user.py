@@ -13,15 +13,13 @@ class User:
         self._user_secret = secret
         self.locale = locale
 
-        if self._consumer_key is None or self._consumer_secret is None:
+        if User._consumer_key is None or User._consumer_secret is None:
             raise ValueError('Consumer key and secret set to None. Run User.get_usos_api_key() first.')
 
         self.session = rauth.OAuth1Session(
-            self._consumer_key, self._consumer_secret,
+            User._consumer_key, User._consumer_secret,
             self._user_token, self._user_secret
         )
-
-        self.pkt_node_ids = []
 
     @classmethod
     def get_usos_api_key(cls):
