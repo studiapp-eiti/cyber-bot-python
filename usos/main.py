@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
-from usos.usos_mysql.usos_mysql_connector import USOSMySQLConnector
-from usos.usos_api_calls import *
-from usos.objects.user import User
+from usos_mysql.usos_mysql_connector import USOSMySQLConnector
+from usos_api_calls import *
+from objects.user import User
 
 if __name__ == '__main__':
     load_dotenv()
