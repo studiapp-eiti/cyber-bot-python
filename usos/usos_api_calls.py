@@ -1,3 +1,4 @@
+from usos.course import Course
 from usos.points import Points
 from usos.user import User
 from usos.node import Node
@@ -8,6 +9,7 @@ STUDENT_POINT_URL = 'services/crstests/student_point'
 NODE_URL = 'services/crstests/node'
 TIMETABLE_URL = 'services/tt/student'
 USER_COURSES_URL = 'services/courses/user'
+USER_COURSES_PARTICIPANT_URL = 'services/groups/participant'
 USER_POINTS_URL = 'services/crstests/user_points'
 
 
@@ -21,14 +23,17 @@ def get_active_term_id(user: User):
 
 
 def get_user_courses(user: User):
-    r = user.session.post(BASE_URL + USER_COURSES_URL, data={'active_terms_only': 'true'})
+    fields = [
+        'course_id', 'class_type', 'course_name', 'term_id', 'class_type_id'
+    ]
+    r = user.session.post(BASE_URL + USER_COURSES_PARTICIPANT_URL, data={
+        'fields': '|'.join(fields),
+        'active_terms': 'true'
+    })
+
     courses = []
-    for course in r.json()['course_editions'][get_active_term_id(user)]:
-        courses.append({
-            'course_id': course['course_id'],
-            'course_name_pl': course['course_name']['pl'],
-            'course_name_en': course['course_name']['en']
-        })
+    for course in r.json()['groups'][get_active_term_id(user)]:
+        courses.append(Course.from_json(course))
 
     return courses
 
