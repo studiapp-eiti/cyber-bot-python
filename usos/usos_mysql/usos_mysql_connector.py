@@ -1,6 +1,6 @@
 import mysql.connector
 import os
-from usos.user import User
+from usos.objects.user import User
 
 
 class USOSMySQLConnector:

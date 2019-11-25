@@ -1,8 +1,8 @@
-from usos.course import Course
-from usos.points import Points
-from usos.program import Program
-from usos.user import User
-from usos.node import Node
+from usos.objects.course import Course
+from usos.objects.points import Points
+from usos.objects.program import Program
+from usos.objects.user import User
+from usos.objects.node import Node
 
 # URLs for USOS API methods
 BASE_URL = 'https://apps.usos.pw.edu.pl/'
