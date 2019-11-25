@@ -1,5 +1,6 @@
 from usos.course import Course
 from usos.points import Points
+from usos.program import Program
 from usos.user import User
 from usos.node import Node
 
@@ -8,6 +9,7 @@ TEST_PARTICIPANT_URL = 'services/crstests/participant'
 STUDENT_POINT_URL = 'services/crstests/student_point'
 NODE_URL = 'services/crstests/node'
 TIMETABLE_URL = 'services/tt/student'
+USER_PROGRAMS_URL = 'services/progs/student'
 USER_COURSES_URL = 'services/courses/user'
 USER_COURSES_PARTICIPANT_URL = 'services/groups/participant'
 USER_POINTS_URL = 'services/crstests/user_points'
@@ -20,6 +22,16 @@ def get_active_term_id(user: User):
     })
 
     return r.json()['terms'][0]['id']
+
+
+def get_user_programs(user: User):
+    r = user.session.get(BASE_URL + USER_PROGRAMS_URL)
+
+    programs = []
+    for program in r.json():
+        programs.append(Program.from_json(program['programme']))
+
+    return programs
 
 
 def get_user_courses(user: User):
