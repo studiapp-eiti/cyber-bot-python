@@ -27,7 +27,7 @@ class USOSMySQLConnector:
             raise OSError('Database-related environment variables not set')
 
         # TODO: Check for errors during connecting to the database
-        self._connector = mysql.connector.connect(
+        self.connector = mysql.connector.connect(
             user=os.getenv(USOSMySQLConnector.DB_USER_VARNAME),
             password=os.getenv(USOSMySQLConnector.DB_PASSWD_VARNAME),
             host=os.getenv(USOSMySQLConnector.DB_HOST_VARNAME),
@@ -45,7 +45,7 @@ class USOSMySQLConnector:
                                                     USOSMySQLConnector.TBL_USERS)
         users = []
 
-        cursor = self._connector.cursor()
+        cursor = self.connector.cursor()
         cursor.execute(query)
         for (usos_token, usos_token_secret, locale) in cursor:
             users.append(User(usos_token, usos_token_secret, locale))
@@ -53,7 +53,7 @@ class USOSMySQLConnector:
 
         return users
 
-    def close_connection(self):
+    def __del__(self):
         """Close connection with database"""
-        if self._connector.is_connected():
-            self._connector.close()
+        if self.connector.is_connected():
+            self.connector.close()
