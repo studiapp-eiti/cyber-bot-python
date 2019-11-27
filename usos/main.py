@@ -23,29 +23,23 @@ if __name__ == '__main__':
         except Exception as err:
             print(err)
 
-    print('Programs:')
-    for i in programs:
+    print('User programs:')
+    for i in sorted(programs, key=lambda x: x.program_name_pl):
         i: Program
-        print(i.program_name_pl)
+        print(i.program_id, i.program_name_pl, sep=' - ')
 
-    print('\nCourses:')
-    for i in courses:
+    print('\nUser courses:')
+    for i in sorted(courses, key=lambda x: x.course_name_pl):
         i: Course
-        print(i.course_name_pl, '---', i.class_type_pl)
+        print(i.course_name_pl, i.class_type_pl, sep=' --- ')
 
-    # print('User programs:')
-    # user_programs = get_user_programs(test_user)
-    # for p in user_programs:
-    #     print(p.program_id, p.program_name_pl)
-    #
-    # update_usos_programs(user_programs, usos_mysql_connector)
-    #
-    # print('\nUser courses:')
-    # user_courses = get_user_courses(test_user)
-    # for c in user_courses:
-    #     print(c.course_id, c.course_name_pl, c.class_type_pl)
-    #
-    # update_usos_courses(user_courses, usos_mysql_connector)
+    print('\nUpdating user_programs table...')
+    update_usos_programs(programs, usos_mysql_connector)
+    print('Done.')
+
+    print('\nUpdating user_courses table...')
+    update_usos_courses(courses, usos_mysql_connector)
+    print('Done.')
 
     # print('\nUser points:')
     # user_points = get_user_points(test_user)
