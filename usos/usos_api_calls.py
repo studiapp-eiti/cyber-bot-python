@@ -15,6 +15,8 @@ USER_COURSES_URL = 'services/courses/user'
 USER_COURSES_PARTICIPANT_URL = 'services/groups/participant'
 USER_POINTS_URL = 'services/crstests/user_points'
 
+# TODO: Make a wrapper aroud `session.post()` and `session.get()` and check for errors
+
 
 def get_active_term_id(user: User) -> str:
     """Gets active term ID
@@ -30,26 +32,26 @@ def get_active_term_id(user: User) -> str:
     return r.json()['terms'][0]['id']
 
 
-def get_user_programs(user: User) -> list:
+def get_user_programs(user: User) -> set:
     """Get all user programs
 
     :param user: User that has an active session
-    :returns: List of Program objects representing user programs
+    :returns: Set of unique Program objects representing user programs
     """
     r = user.session.get(BASE_URL + USER_PROGRAMS_URL)
 
-    programs = []
+    programs = set()
     for program in r.json():
-        programs.append(Program.from_json(program['programme']))
+        programs.add(Program.from_json(program['programme']))
 
     return programs
 
 
-def get_user_courses(user: User) -> list:
+def get_user_courses(user: User) -> set:
     """Get all user courses
 
     :param user: User that has an active session
-    :returns: List of Course objects representing user courses
+    :returns: Set of unique Course objects representing user courses
     """
     fields = [
         'course_id', 'class_type', 'course_name', 'term_id', 'class_type_id'
@@ -59,9 +61,9 @@ def get_user_courses(user: User) -> list:
         'active_terms': 'true'
     })
 
-    courses = []
+    courses = set()
     for course in r.json()['groups'][get_active_term_id(user)]:
-        courses.append(Course.from_json(course))
+        courses.add(Course.from_json(course))
 
     return courses
 

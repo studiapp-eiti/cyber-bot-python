@@ -14,19 +14,38 @@ if __name__ == '__main__':
 
     test_user = User(os.getenv('TEST_USER_TOKEN'), os.getenv('TEST_USER_SECRET'), 'pl')
 
-    print('User programs:')
-    user_programs = get_user_programs(test_user)
-    for p in user_programs:
-        print(p.program_id, p.program_name_pl)
+    courses = set()
+    programs = set()
+    for u in users:
+        try:
+            programs.update(get_user_programs(u))
+            courses.update(get_user_courses(u))
+        except Exception as err:
+            print(err)
 
-    update_usos_programs(user_programs, usos_mysql_connector)
+    print('Programs:')
+    for i in programs:
+        i: Program
+        print(i.program_name_pl)
 
-    print('\nUser courses:')
-    user_courses = get_user_courses(test_user)
-    for c in user_courses:
-        print(c.course_id, c.course_name_pl, c.class_type_pl)
+    print('\nCourses:')
+    for i in courses:
+        i: Course
+        print(i.course_name_pl, '---', i.class_type_pl)
 
-    update_usos_courses(user_courses, usos_mysql_connector)
+    # print('User programs:')
+    # user_programs = get_user_programs(test_user)
+    # for p in user_programs:
+    #     print(p.program_id, p.program_name_pl)
+    #
+    # update_usos_programs(user_programs, usos_mysql_connector)
+    #
+    # print('\nUser courses:')
+    # user_courses = get_user_courses(test_user)
+    # for c in user_courses:
+    #     print(c.course_id, c.course_name_pl, c.class_type_pl)
+    #
+    # update_usos_courses(user_courses, usos_mysql_connector)
 
     # print('\nUser points:')
     # user_points = get_user_points(test_user)
