@@ -16,3 +16,9 @@ class Program:
         return cls(
             json_data['id'], json_data['description']['pl'], json_data['description']['en']
         )
+
+    def __hash__(self):
+        return hash(self.program_id)
+
+    def __eq__(self, other):
+        return self.program_id == other.program_id

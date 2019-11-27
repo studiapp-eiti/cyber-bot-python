@@ -22,3 +22,9 @@ class Course:
             json_data['class_type']['pl'], json_data['class_type']['en'],
             json_data['term_id'], json_data['class_type_id']
         )
+
+    def __hash__(self):
+        return hash((self.course_id, self.class_type_id))
+
+    def __eq__(self, other):
+        return self.course_id == other.course_id and self.class_type_id == other.class_type_id
