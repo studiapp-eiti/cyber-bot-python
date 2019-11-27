@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from usos_mysql.usos_mysql_connector import USOSMySQLConnector
 from usos_api_calls import *
 from objects.user import User
-from usos_mysql.update_tables import update_usos_courses
+from usos_mysql.update_tables import update_usos_courses, update_usos_programs
 
 if __name__ == '__main__':
     load_dotenv()
@@ -18,6 +18,8 @@ if __name__ == '__main__':
     user_programs = get_user_programs(test_user)
     for p in user_programs:
         print(p.program_id, p.program_name_pl)
+
+    update_usos_programs(user_programs, usos_mysql_connector)
 
     print('\nUser courses:')
     user_courses = get_user_courses(test_user)

@@ -32,3 +32,34 @@ def update_usos_courses(courses: list, connector: USOSMySQLConnector):
     cursor.executemany(insert_new_courses, insert_data)
     connector.connector.commit()
     cursor.close()
+
+
+def update_usos_programs(programs: list, connector: USOSMySQLConnector):
+    """Updates `usos_programs` table
+
+    Gets all programs from DB and compares results with `programs` list.
+    If it finds a program that is not present in DB it inserts it.
+
+    :param programs: List of usos programs
+    :param connector: MySQL DB connector
+    """
+    cursor = connector.connector.cursor()
+
+    get_programs_query = 'select program_id from usos_programs;'
+    cursor.execute(get_programs_query)
+
+    db_program_ids = [i for i in cursor]
+    insert_data = []
+    for p in programs:
+        if p.program_id not in db_program_ids:
+            insert_data.append((
+                p.program_id, p.program_name_pl, p.program_name_en
+            ))
+
+    insert_new_programs = 'insert into usos_programs (' \
+                          'program_id, program_name_pl, program_name_en) ' \
+                          'values (%s, %s, %s);'
+
+    cursor.executemany(insert_new_programs, insert_data)
+    connector.connector.commit()
+    cursor.close()
