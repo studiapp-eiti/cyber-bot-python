@@ -1,4 +1,3 @@
-import os
 from dotenv import load_dotenv
 from db.db_connector import DBConnector
 from usos_api_calls import *
@@ -12,8 +11,6 @@ if __name__ == '__main__':
     User.get_usos_api_key()
     usos_mysql_connector = DBConnector()
     users = get_usos_users(usos_mysql_connector)
-
-    test_user = User(os.getenv('TEST_USER_TOKEN'), os.getenv('TEST_USER_SECRET'), 'pl')
 
     courses = set()
     programs = set()
