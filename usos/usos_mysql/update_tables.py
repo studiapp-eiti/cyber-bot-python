@@ -1,7 +1,7 @@
-from usos_mysql.usos_mysql_connector import USOSMySQLConnector
+from db.db_connector import DBConnector
 
 
-def update_usos_courses(courses: set, connector: USOSMySQLConnector):
+def update_usos_courses(courses: set, connector: DBConnector):
     """Update `usos_courses` table
 
     Gets all courses from DB and compares results with `courses` list.
@@ -10,7 +10,7 @@ def update_usos_courses(courses: set, connector: USOSMySQLConnector):
     :param courses: Set of usos courses
     :param connector: MySQL DB connector
     """
-    cursor = connector.connector.cursor()
+    cursor = connector.connection.cursor()
 
     get_courses_query = 'select course_id from usos_courses;'
     cursor.execute(get_courses_query)
@@ -33,11 +33,11 @@ def update_usos_courses(courses: set, connector: USOSMySQLConnector):
                          'term_id) values (%s, %s, %s, %s, %s, %s, %s);'
 
     cursor.executemany(insert_new_courses, insert_data)
-    connector.connector.commit()
+    connector.connection.commit()
     cursor.close()
 
 
-def update_usos_programs(programs: set, connector: USOSMySQLConnector):
+def update_usos_programs(programs: set, connector: DBConnector):
     """Updates `usos_programs` table
 
     Gets all programs from DB and compares results with `programs` list.
@@ -46,7 +46,7 @@ def update_usos_programs(programs: set, connector: USOSMySQLConnector):
     :param programs: Set of usos programs
     :param connector: MySQL DB connector
     """
-    cursor = connector.connector.cursor()
+    cursor = connector.connection.cursor()
 
     get_programs_query = 'select program_id from usos_programs;'
     cursor.execute(get_programs_query)
@@ -69,5 +69,5 @@ def update_usos_programs(programs: set, connector: USOSMySQLConnector):
                           'values (%s, %s, %s, %s, %s);'
 
     cursor.executemany(insert_new_programs, insert_data)
-    connector.connector.commit()
+    connector.connection.commit()
     cursor.close()

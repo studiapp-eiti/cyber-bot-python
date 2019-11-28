@@ -1,16 +1,17 @@
 import os
 from dotenv import load_dotenv
-from usos_mysql.usos_mysql_connector import USOSMySQLConnector
+from db.db_connector import DBConnector
 from usos_api_calls import *
 from objects.user import User
 from usos_mysql.update_tables import update_usos_courses, update_usos_programs
+from usos_mysql.user_ops import get_usos_users
 
 if __name__ == '__main__':
     load_dotenv()
 
     User.get_usos_api_key()
-    usos_mysql_connector = USOSMySQLConnector()
-    users = usos_mysql_connector.get_usos_users()
+    usos_mysql_connector = DBConnector()
+    users = get_usos_users(usos_mysql_connector)
 
     test_user = User(os.getenv('TEST_USER_TOKEN'), os.getenv('TEST_USER_SECRET'), 'pl')
 
