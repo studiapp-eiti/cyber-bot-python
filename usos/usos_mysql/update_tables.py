@@ -56,15 +56,17 @@ def update_usos_programs(programs: set, connector: USOSMySQLConnector):
     for p in programs:
         if p.program_id not in db_program_ids:
             insert_data.append((
-                p.program_id, p.program_name_pl, p.program_name_en
+                p.program_id, p.program_name_pl, p.short_program_name_pl,
+                p.program_name_en, p.short_program_name_en
             ))
 
     if len(insert_data) == 0:
         return
 
     insert_new_programs = 'insert into usos_programs (' \
-                          'program_id, program_name_pl, program_name_en) ' \
-                          'values (%s, %s, %s);'
+                          'program_id, program_name_pl, short_program_name_pl, ' \
+                          'program_name_en, short_program_name_en) ' \
+                          'values (%s, %s, %s, %s, %s);'
 
     cursor.executemany(insert_new_programs, insert_data)
     connector.connector.commit()
