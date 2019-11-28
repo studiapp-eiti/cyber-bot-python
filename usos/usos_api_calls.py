@@ -54,7 +54,7 @@ def get_user_courses(user: User) -> set:
     :returns: Set of unique Course objects representing user courses
     """
     fields = [
-        'course_id', 'class_type', 'course_name', 'term_id', 'class_type_id'
+        'course_id', 'course_name', 'term_id'
     ]
     r = user.session.post(BASE_URL + USER_COURSES_PARTICIPANT_URL, data={
         'fields': '|'.join(fields),

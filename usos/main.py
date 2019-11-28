@@ -29,7 +29,7 @@ if __name__ == '__main__':
     print('\nUser courses:')
     for i in sorted(courses, key=lambda x: x.course_name_pl):
         i: Course
-        print(i.course_name_pl, i.class_type_pl, sep=' --- ')
+        print(i.course_id, i.course_name_pl, sep=' - ')
 
     print('\nUpdating user_programs table...')
     update_usos_programs(programs, usos_mysql_connector)

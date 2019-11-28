@@ -20,8 +20,8 @@ def update_usos_courses(courses: set, connector: DBConnector):
     for c in courses:
         if c.course_id not in db_course_ids:
             insert_data.append((
-                c.course_id, c.course_name_pl, c.course_name_en,
-                c.class_type_pl, c.class_type_en, c.class_type_id, c.term_id
+                c.course_id, c.course_name_pl,
+                c.course_name_en, c.term_id
             ))
 
     if len(insert_data) == 0:
@@ -29,8 +29,7 @@ def update_usos_courses(courses: set, connector: DBConnector):
 
     insert_new_courses = 'insert into usos_courses (' \
                          'course_id, course_name_pl, course_name_en, ' \
-                         'class_type_pl, class_type_en, class_type_id, ' \
-                         'term_id) values (%s, %s, %s, %s, %s, %s, %s);'
+                         'term_id) values (%s, %s, %s, %s);'
 
     cursor.executemany(insert_new_courses, insert_data)
     connector.connection.commit()
