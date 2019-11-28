@@ -7,6 +7,14 @@ class Program:
         self.program_name_pl = program_name_pl
         self.program_name_en = program_name_en
 
+    @property
+    def short_program_name_pl(self):
+        return self.program_name_pl.split(',')[0]
+
+    @property
+    def short_program_name_en(self):
+        return self.program_name_en.split(',')[0]
+
     @classmethod
     def from_json(cls, json_data: dict):
         """Constructs a new Program object from given JSON data
