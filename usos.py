@@ -1,50 +1,62 @@
-import rauth
+from dotenv import load_dotenv
+from db.db_connector import DBConnector
+from usos.usos_api_calls import *
+from usos.objects.user import User
+from usos.usos_mysql.update_tables import update_usos_courses, update_usos_programs, update_usos_points
+from usos.usos_mysql.user_ops import get_usos_users
 
+if __name__ == '__main__':
+    load_dotenv()
 
-class USOS_Connection:
-    def __init__(self):
-        base_url = 'https://apps.usos.pw.edu.pl/'
-        req_token_url = 'services/oauth/request_token'
-        auth_url = 'services/oauth/authorize'
-        acc_token_url = 'services/oauth/access_token'
+    User.get_usos_api_key()
+    usos_mysql_connector = DBConnector()
+    users = get_usos_users(usos_mysql_connector)
 
-        consumer_key, consumer_secret = self._obtain_api_key()  # File with credentials should be in the same path
+    courses = set()
+    programs = set()
+    points = set()
+    for u in users:
+        try:
+            programs.update(get_user_programs(u))
+            courses.update(get_user_courses(u))
+            points.update(get_user_points(u))
+        except Exception as err:
+            print(err)
 
-        self._service = rauth.OAuth1Service(consumer_key=consumer_key,
-                                           consumer_secret=consumer_secret,
-			                   name='USOSAPI',
-			                   request_token_url=req_token_url,
-			                   authorize_url=auth_url,
-			                   access_token_url=acc_token_url,
-			                   base_url=base_url)
+    print('User programs:')
+    for i in sorted(programs, key=lambda x: x.program_name_pl):
+        i: Program
+        print(i.program_id, i.program_name_pl, sep=' - ')
 
+    print('\nUser courses:')
+    for i in sorted(courses, key=lambda x: x.course_name_pl):
+        i: Course
+        print(i.course_id, i.course_name_pl, sep=' - ')
 
-        request_token, request_token_secret = self._service.get_request_token(params={
-            'oauth_callback': 'oob',  # We don't specify callback URL (yet)
-            'scopes':'grades|studies'  # What information we want to have access to
-        })
+    print('\nUser points:')
+    for i in sorted(points, key=lambda x: x.name):
+        i: Points
+        print(i.course_id, i.name, i.points, sep=' - ')
 
-        print('Go to this URL to authorize: ', base_url + self._service.get_authorize_url(request_token))
-        pin = input('Enter PIN: ')
+    print('\nUpdating user_programs table...')
+    update_usos_programs(programs, usos_mysql_connector)
+    print('Done.')
 
-        self._session = self._service.get_auth_session(request_token,
-                                                     request_token_secret,
-                                                     method='POST',
-                                                     data={'oauth_verifier': pin})
+    print('\nUpdating user_courses table...')
+    update_usos_courses(courses, usos_mysql_connector)
+    print('Done.')
 
+    print('\nUpdating user_points table...')
+    update_usos_points(points, usos_mysql_connector)
+    print('Done.')
 
-    def _obtain_api_key(self) -> tuple:
-        key = ''
-        secret = ''
-        with open('usos_cred') as f:
-            key, secret = f.read().split('\n')
-        return key, secret
-
-
-    def get_class_schedule(self, days: int):
-        assert (days <= 7 and days > 0), 'You can include no more than 7 days in schedule'
-        print(self._session.get('services/tt/student', params={'days': days}).text)
-
-
-    def get_recent_grades(self):
-        print(self._session.get('services/grades/latest').text)
+    # print('\nUser points:')
+    # user_points = get_user_points(test_user)
+    # for course, points in user_points.items():
+    #     print(course)
+    #     for point in points:
+    #         print('\t{} - Score: {} points [{}]'.format(point.name, point.points, point.comment))
+    #
+    # print('\nUser timetable for tomorrow:')
+    # tt = get_timetable_for_tommorow(test_user)
+    # print(tt)
