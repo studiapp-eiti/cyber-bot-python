@@ -19,7 +19,7 @@ class Node:
         :param json_data: Data returned from `services/crstests/node`
         It should contain root node as its first element
         :param parent_node: Parent node (should be `None` for root node)
-        :type parent_node: Node
+        :type parent_node: Node, NoneType
         :returns: Node tree with root node on top
         """
         if parent_node is not None and parent_node.node_id != json_data['parent_id']:
