@@ -23,7 +23,12 @@ def get_usos_users(connector: DBConnector) -> list:
     cursor = connector.connection.cursor()
     cursor.execute(query)
     for (usos_token, usos_token_secret, locale) in cursor:
-        users.append(User(usos_token, usos_token_secret, locale))
+        try:
+            users.append(User(usos_token, usos_token_secret, locale))
+        except ValueError as err:
+            # TODO: Delete user from DB or send him relogin request
+            print(err)
+
     cursor.close()
 
     return users

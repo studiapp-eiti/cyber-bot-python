@@ -31,9 +31,15 @@ class User:
 
         Check for environment variables is issued before attempt to get user OAuth session
         """
+        self.session = None
         self._user_token = token
         self._user_secret = secret
+        if self._user_token is None or self._user_secret is None:
+            raise ValueError('Missing user_token and/or user_secret.')
+
         self.locale = locale
+        if self.locale not in ['pl', 'en']:
+            raise ValueError('Unsupported locale: {}. Only \'pl\' or \'en\' are allowed.'.format(self.locale))
 
         if User._consumer_key is None or User._consumer_secret is None:
             raise ValueError('Consumer key and secret set to None. Run User.get_usos_api_key() first.')
@@ -42,6 +48,11 @@ class User:
             User._consumer_key, User._consumer_secret,
             self._user_token, self._user_secret
         )
+
+    def __del__(self):
+        """Close session when deleting object"""
+        if self.session:
+            self.session.close()
 
     @classmethod
     def get_usos_api_key(cls):
