@@ -2,6 +2,19 @@ import os
 import rauth
 
 
+def api_req(req):
+    def catch_errors(*args, **kwargs):
+        r = req(*args, **kwargs)
+        if r.status_code == 400:
+            raise RuntimeError('HTTP 400 Bad Request for: {}\nResponse message: {}'.format(r.url, r.json()['message']))
+        elif r.status_code == 401:
+            raise RuntimeError('HTTP 401 Unauthorized for: {}\nResponse message: {}'.format(r.url, r.json()['message']))
+        elif r.status_code == 500:
+            raise RuntimeError('HTTP 500 Internal Server Error for: {}\nResponse: {}'.format(r.url, r.text))
+        return r
+    return catch_errors
+
+
 class User:
     """Class for holding student information required to interact with USOS API"""
 
@@ -40,12 +53,12 @@ class User:
         cls._consumer_key = os.getenv(cls.CONSUMER_KEY_VARNAME)
         cls._consumer_secret = os.getenv(cls.CONSUMER_SECRET_VARNAME)
 
-    # TODO: Catch errors when making API calls
-
+    @api_req
     def api_post(self, url, *args, **kwargs):
         """Wrapper aroud session.post()"""
         return self.session.post(url, *args, **kwargs)
 
+    @api_req
     def api_get(self, url, **kwargs):
         """Wrapper aroud session.get()"""
         return self.session.get(url, **kwargs)
