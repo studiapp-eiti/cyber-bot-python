@@ -1,6 +1,9 @@
 import requests
 import json
+from pathlib import Path
 from urllib3.exceptions import InsecureRequestWarning
+import ssl
+ssl.match_hostname = lambda cert, hostname: True
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -12,7 +15,7 @@ class Notifier:
     def __init__(self, users):
         """
 
-        :type users: list
+        :type users: list[int]
         """
         self.users = users
 
@@ -20,9 +23,7 @@ class Notifier:
         payload = ({"user_ids": self.users})
         payload.update(other_params)
         data = json.dumps(payload)
-        print(data)
         response = requests.post(self.URL, data=data, headers=self.HEADERS, verify=False)
-        print(response.content)
         return response.status_code == 200
 
     def message_session_expired(self):
@@ -30,3 +31,11 @@ class Notifier:
             [{"title": "Log in", "url": "https://cyber-bot.westeurope.cloudapp.azure.com/n/studia3/login"}, ]}
         return self.call_api(params)
 
+# if __name__ == "__main__":
+#     N = Notifier([14])
+#     N.message_session_expired()
+#
+#     p = Path("/var/www/node/certs/key.pem")
+#     print(p.is_absolute())
+#     print(p.exists())
+#     print(p)

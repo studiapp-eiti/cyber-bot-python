@@ -33,10 +33,6 @@ class Db:
         self.db.close()
 
     @staticmethod
-    def mysql_dt_format(timestamp):
-        dt = datetime.datetime.fromtimestamp(timestamp)
-
-    @staticmethod
     def get_credentials():
         env_path = Path(__file__).parents[1] / ".env"
         load_dotenv(dotenv_path=env_path)
