@@ -66,14 +66,14 @@ def get_user_courses(user: User) -> set:
     return courses
 
 
-def get_user_points(user: User) -> dict:
+def get_user_points(user: User) -> set:
     """Get all points that user has scored in all courses
 
     :param user: User that has an active session
-    :returns: Dictionary in format `{'course_id': Point}` that represents user points in all courses
+    :returns: Set of all points scored by user
     """
     r = user.api_get(BASE_URL + TEST_PARTICIPANT_URL)
-    user_points = {}
+    user_points = set()
 
     for root_id, root_content in r.json()['tests'][get_active_term_id(user)].items():
         fields = [
@@ -94,11 +94,12 @@ def get_user_points(user: User) -> dict:
         })
 
         course_id = root_content['course_edition']['course_id']
-        user_points[course_id] = []
         for point in r.json():
-            # We need to add 'name' attribute to point because API doesn't return it
+            # We need to add 'name' and 'course_id' attributes to point because API doesn't return them
             point['name'] = Node.get_node_by_id(root_node, point['node_id']).name
-            user_points[course_id].append(Points.from_json(point))
+            point['course_id'] = course_id
+
+            user_points.add(Points.from_json(point))
 
     return user_points
 
