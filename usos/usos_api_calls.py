@@ -15,8 +15,6 @@ USER_COURSES_URL = 'services/courses/user'
 USER_COURSES_PARTICIPANT_URL = 'services/groups/participant'
 USER_POINTS_URL = 'services/crstests/user_points'
 
-# TODO: Make a wrapper aroud `session.post()` and `session.get()` and check for errors
-
 
 def get_active_term_id(user: User) -> str:
     """Gets active term ID
@@ -24,7 +22,7 @@ def get_active_term_id(user: User) -> str:
     :param user: User that has an active session
     :returns: A string representing term ID
     """
-    r = user.session.post(BASE_URL + USER_COURSES_URL, data={
+    r = user.api_post(BASE_URL + USER_COURSES_URL, data={
         'fields': 'terms',
         'active_terms_only': 'true'
     })
@@ -38,7 +36,7 @@ def get_user_programs(user: User) -> set:
     :param user: User that has an active session
     :returns: Set of unique Program objects representing user programs
     """
-    r = user.session.get(BASE_URL + USER_PROGRAMS_URL)
+    r = user.api_get(BASE_URL + USER_PROGRAMS_URL)
 
     programs = set()
     for program in r.json():
@@ -56,7 +54,7 @@ def get_user_courses(user: User) -> set:
     fields = [
         'course_id', 'course_name', 'term_id'
     ]
-    r = user.session.post(BASE_URL + USER_COURSES_PARTICIPANT_URL, data={
+    r = user.api_post(BASE_URL + USER_COURSES_PARTICIPANT_URL, data={
         'fields': '|'.join(fields),
         'active_terms': 'true'
     })
@@ -74,7 +72,7 @@ def get_user_points(user: User) -> dict:
     :param user: User that has an active session
     :returns: Dictionary in format `{'course_id': Point}` that represents user points in all courses
     """
-    r = user.session.get(BASE_URL + TEST_PARTICIPANT_URL)
+    r = user.api_get(BASE_URL + TEST_PARTICIPANT_URL)
     user_points = {}
 
     for root_id, root_content in r.json()['tests'][get_active_term_id(user)].items():
@@ -82,7 +80,7 @@ def get_user_points(user: User) -> dict:
             'node_id', 'root_id', 'parent_id',
             'name', 'type', 'subnodes'
         ]
-        r = user.session.post(BASE_URL + NODE_URL, data={
+        r = user.api_post(BASE_URL + NODE_URL, data={
             'node_id': root_id,
             'recursive': 'true',
             'fields': '|'.join(fields)
@@ -91,7 +89,7 @@ def get_user_points(user: User) -> dict:
         root_node = Node.from_json(r.json(), None)
         pkt_node_ids = [str(i) for i in Node.search_tree(root_node, lambda x: x.type == 'pkt', lambda x: x.node_id)]
 
-        r = user.session.post(BASE_URL + USER_POINTS_URL, data={
+        r = user.api_post(BASE_URL + USER_POINTS_URL, data={
             'node_ids': '|'.join(pkt_node_ids)
         })
 
@@ -112,5 +110,5 @@ def get_timetable_for_tommorow(user: User):
     :returns: User's timetable for tommorow
     """
     # TODO: Make timetable class and return it
-    r = user.session.post(BASE_URL + TIMETABLE_URL, data={'days': 4})
+    r = user.api_post(BASE_URL + TIMETABLE_URL, data={'days': 4})
     return r.json()

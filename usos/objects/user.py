@@ -39,3 +39,13 @@ class User:
 
         cls._consumer_key = os.getenv(cls.CONSUMER_KEY_VARNAME)
         cls._consumer_secret = os.getenv(cls.CONSUMER_SECRET_VARNAME)
+
+    # TODO: Catch errors when making API calls
+
+    def api_post(self, url, *args, **kwargs):
+        """Wrapper aroud session.post()"""
+        return self.session.post(url, *args, **kwargs)
+
+    def api_get(self, url, **kwargs):
+        """Wrapper aroud session.get()"""
+        return self.session.get(url, **kwargs)
