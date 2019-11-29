@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
 from db.db_connector import DBConnector
-from usos_api_calls import *
-from objects.user import User
-from usos_mysql.update_tables import update_usos_courses, update_usos_programs
-from usos_mysql.user_ops import get_usos_users
+from usos.usos_api_calls import *
+from usos.objects.user import User
+from usos.usos_mysql.update_tables import update_usos_courses, update_usos_programs
+from usos.usos_mysql.user_ops import get_usos_users
 
 if __name__ == '__main__':
     load_dotenv()

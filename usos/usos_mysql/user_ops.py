@@ -1,5 +1,5 @@
 from db.db_connector import DBConnector
-from objects.user import User
+from usos.objects.user import User
 
 
 def get_usos_users(connector: DBConnector) -> list:
