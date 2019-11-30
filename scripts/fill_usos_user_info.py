@@ -47,7 +47,7 @@ if __name__ == '__main__':
                                'where id = %s;'
             cursor.execute(insert_usos_info, (
                 usos_info['id'], usos_info['first_name'], usos_info['last_name'],
-                ';'.join([course_ids[c.course_id] for c in courses]), uid
+                ';'.join(sorted([course_ids[c.course_id] for c in courses])), uid
             ))
 
         connector.connection.commit()
