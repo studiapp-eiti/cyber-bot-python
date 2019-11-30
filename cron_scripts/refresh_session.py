@@ -1,13 +1,8 @@
 import logging
-import os
-import sys
 import datetime
 import random
 import time
 from dotenv import load_dotenv
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
 from db import db_connector
 from studia3.studia3_mysql import queries
 from studia3 import studia_requests
