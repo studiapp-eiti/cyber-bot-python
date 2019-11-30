@@ -1,6 +1,4 @@
 import sys
-sys.path.append('../')
-
 from dotenv import load_dotenv
 from db.db_connector import DBConnector
 from argparse import ArgumentParser
