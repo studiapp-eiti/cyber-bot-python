@@ -51,8 +51,9 @@ if __name__ == '__main__':
             ))
 
         connector.connection.commit()
+        cursor.close()
     except Error as err:
         print('MySQL Error:', err.msg)
         connector.connection.rollback()
-    finally:
         cursor.close()
+        sys.exit(-2)
