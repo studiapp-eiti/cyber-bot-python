@@ -11,9 +11,9 @@ def get_usos_users(connector: DBConnector) -> list:
 
     # Column names
     columns = [
-        'first_name', 'last_name', 'nickname', 'gender',
-        'usos_id', 'usos_courses', 'usos_token', 'usos_token_secret',
-        'locale', 'is_registered'
+        'fb_first_name', 'fb_last_name', 'nickname', 'gender',
+        'usos_first_name', 'usos_last_name', 'usos_id', 'usos_courses',
+        'usos_token', 'usos_token_secret', 'locale', 'is_registered'
     ]
     query = 'select {} from users;'.format(', '.join(columns))
 
