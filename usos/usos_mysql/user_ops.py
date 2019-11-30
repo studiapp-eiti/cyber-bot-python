@@ -10,24 +10,20 @@ def get_usos_users(connector: DBConnector) -> list:
     """
 
     # Column names
-    col_usos_token = 'usos_token'
-    col_usos_token_secret = 'usos_token_secret'
-    col_usos_locale = 'locale'
-
-    query = 'select {}, {}, {} from users;'.format(
-        col_usos_token, col_usos_token_secret, col_usos_locale
-    )
+    columns = [
+        'first_name', 'last_name', 'nickname', 'gender',
+        'usos_id', 'usos_courses', 'usos_token', 'usos_token_secret',
+        'locale', 'is_registered'
+    ]
+    query = 'select {} from users;'.format(', '.join(columns))
 
     users = []
 
-    cursor = connector.connection.cursor()
+    cursor = connector.connection.cursor(dictionary=True)
     cursor.execute(query)
-    for (usos_token, usos_token_secret, locale) in cursor:
-        try:
-            users.append(User(usos_token, usos_token_secret, locale))
-        except ValueError as err:
-            # TODO: Delete user from DB or send him relogin request
-            print(err)
+    for user_data in cursor:
+        if user_data['is_registered']:
+            users.append(User(**user_data))
 
     cursor.close()
 

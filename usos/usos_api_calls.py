@@ -14,6 +14,7 @@ USER_PROGRAMS_URL = 'services/progs/student'
 USER_COURSES_URL = 'services/courses/user'
 USER_COURSES_PARTICIPANT_URL = 'services/groups/participant'
 USER_POINTS_URL = 'services/crstests/user_points'
+USER_URL = 'services/users/user'
 
 
 def get_active_terms_ids(user: User) -> list:
@@ -117,4 +118,19 @@ def get_timetable_for_tommorow(user: User):
     """
     # TODO: Make timetable class and return it
     r = user.api_post(BASE_URL + TIMETABLE_URL, data={'days': 4})
+    return r.json()
+
+
+def get_user_usos_id_and_name(user: User) -> dict:
+    """Get user usos_id, first_name and last_name
+
+    :param user: User that has an active session
+    :returns: Dict that contains usos_id, first_name and last_name
+    """
+    fields = [
+        'id', 'first_name', 'last_name'
+    ]
+    r = user.api_post(BASE_URL + USER_URL, data={
+        'fields': '|'.join(fields)
+    })
     return r.json()

@@ -26,23 +26,31 @@ class User:
     _consumer_key = None
     _consumer_secret = None
 
-    def __init__(self, token, secret, locale):
+    def __init__(self, first_name, last_name, nickname, gender, usos_id,
+                 usos_token, usos_token_secret, usos_courses, locale, is_registered):
         """Constructs new User object.
 
         Check for environment variables is issued before attempt to get user OAuth session
         """
-        self.session = None
-        self._user_token = token
-        self._user_secret = secret
-        if self._user_token is None or self._user_secret is None:
-            raise ValueError('Missing user_token and/or user_secret.')
-
+        self.first_name = first_name
+        self.last_name = last_name
+        self.nickname = nickname
+        self.gender = gender
+        self.usos_id = usos_id
+        self.courses = usos_courses
         self.locale = locale
-        if self.locale not in ['pl', 'en']:
-            raise ValueError('Unsupported locale: {}. Only \'pl\' or \'en\' are allowed.'.format(self.locale))
+        self.is_registered = is_registered
+
+        self._user_token = usos_token
+        self._user_secret = usos_token_secret
+        self.session = None
 
         if User._consumer_key is None or User._consumer_secret is None:
             raise ValueError('Consumer key and secret set to None. Run User.get_usos_api_key() first.')
+        if self._user_token is None or self._user_secret is None:
+            raise ValueError('Missing user_token and/or user_secret.')
+        if self.locale not in ['pl', 'en']:
+            raise ValueError('Unsupported locale: {}. Only \'pl\' or \'en\' are allowed.'.format(self.locale))
 
         self.session = rauth.OAuth1Session(
             User._consumer_key, User._consumer_secret,
