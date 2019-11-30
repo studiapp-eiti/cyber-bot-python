@@ -1,5 +1,3 @@
-import json
-
 from dotenv import load_dotenv
 from db.db_connector import DBConnector
 from usos.usos_api_calls import *
@@ -23,7 +21,6 @@ if __name__ == '__main__':
             programs.update(get_user_programs(u))
             courses.update(get_user_courses(u))
             points.update(get_user_points(u))
-            print(json.dumps(get_user_usos_id_and_name(u), ensure_ascii=False, indent=2))
         except Exception as err:
             print(traceback.format_exc())
             print(type(err), err)

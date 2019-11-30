@@ -50,6 +50,10 @@ def update_usos_programs(programs: set, connector: DBConnector):
 def update_usos_points(points: set, connector: DBConnector):
     """Update `usos_points` table
 
+    It doesn't utilize `generic_update_table()` function because
+    it doesn't have a single primary key. In this case it's
+    compilation of `node_id` and `student_id` attributes.
+
     :param points: Set of user points
     :param connector: MySQL DB connector
     """
@@ -57,17 +61,32 @@ def update_usos_points(points: set, connector: DBConnector):
         'node_id', 'name', 'points', 'comment',
         'grader_id', 'student_id', 'last_changed', 'course_id'
     ]
-    generic_update_table(
-        objects=points,
-        table_name='usos_points',
-        columns=columns,
-        obj_pkey=lambda p: p.node_id,
-        obj_to_tuple=lambda p: (
-            p.node_id, p.name, p.points, p.comment,
-            p.grader_id, p.student_id, p.last_changed, p.course_id
-        ),
-        connector=connector
+
+    cursor = connector.connection.cursor(dictionary=True)
+    get_pkeys_query = 'select node_id, student_id from usos_points;'
+    cursor.execute(get_pkeys_query)
+
+    pkeys = {hash((str(i['node_id']), str(i['student_id']))) for i in cursor}
+    insert_data = []
+    for p in points:
+        if hash((str(p.node_id), str(p.student_id))) not in pkeys:
+            print('Adding', p.node_id, p.student_id)
+            insert_data.append((
+                p.node_id, p.name, p.points, p.comment,
+                p.grader_id, p.student_id, p.last_changed, p.course_id
+            ))
+
+    if len(insert_data) == 0:
+        cursor.close()
+        return
+
+    insert_new_data = 'insert into usos_points ({}) values ({});'.format(
+        ', '.join(columns), ', '.join(['%s' for i in range(len(columns))])
     )
+
+    cursor.executemany(insert_new_data, insert_data)
+    connector.connection.commit()
+    cursor.close()
 
 
 def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey, obj_to_tuple, connector: DBConnector):
@@ -99,6 +118,7 @@ def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey,
             insert_data.append(obj_to_tuple(obj))
 
     if len(insert_data) == 0:
+        cursor.close()
         return
 
     insert_new_data = 'insert into {} ({}) values ({});'.format(
