@@ -1,4 +1,5 @@
 import sys
+import pathlib
 from dotenv import load_dotenv
 from db.db_connector import DBConnector
 from argparse import ArgumentParser
@@ -17,7 +18,8 @@ if __name__ == '__main__':
     )
     args = argparser.parse_args()
 
-    load_dotenv()
+    env_path = pathlib.Path(__file__).parents[1] / '.env'
+    load_dotenv(dotenv_path=env_path)
     connector = DBConnector()
     connector.connection.autocommit = False
 
