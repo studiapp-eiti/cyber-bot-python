@@ -1,14 +1,13 @@
 import mysql.connector
 import mysql.connector.errors
 
-
 class Queries:
     def __init__(self, db):
         """
 
-        :type db: mysql.connector.MySQLConnection
+        :type db: db.DbConnector
         """
-        self.db = db
+        self.db = db.connection
         self.cursor = None
 
     def carry_transaction(self, fun, commitable=False):

@@ -30,12 +30,3 @@ class Notifier:
         params = {"text": "Hey, $user.name Studia3 session has expired. Please log in again:", "message_type": "button", "buttons":
             [{"title": "Log in", "url": "https://cyber-bot.westeurope.cloudapp.azure.com/n/studia3/login"}, ]}
         return self.call_api(params)
-
-# if __name__ == "__main__":
-#     N = Notifier([14])
-#     N.message_session_expired()
-#
-#     p = Path("/var/www/node/certs/key.pem")
-#     print(p.is_absolute())
-#     print(p.exists())
-#     print(p)
