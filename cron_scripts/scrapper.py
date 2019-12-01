@@ -1,18 +1,19 @@
-import os
-import sys
-
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-# from studia3.studia3_mysql import db_handler
-from studia3 import studia_requests
-
-
+from db import db_connector
+from studia3.studia3_mysql.queries import Queries
+import pathlib
+from dotenv import load_dotenv
+from studia3.studia_requests import Studia3Client
 
 
 def scrap():
-    # Fetch Ids and courses from DB TODO do it properly for users from users table, not from studia_sessions
-    # db = db_handler.Db()
-    # maintainers = db.get_cookies()
-    for user in maintainers:
-        cookie = user["cookie"]
-        studia3_client = studia_requests.Studia3Client(cookie, use_session=True)
+    load_dotenv()
+    db = db_connector.DBConnector()
+    q = Queries(db)
+    cookies = q.carry_transaction(lambda: q.get_cookies())
+    if cookies:
+        for cookie in cookies:
+            print(Studia3Client.get_all_courses_urls(cookie["cookie"]))
+
+
+if __name__ == "__main__":
+    scrap()

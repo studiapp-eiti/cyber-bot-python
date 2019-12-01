@@ -5,8 +5,10 @@ import time
 from dotenv import load_dotenv
 from db import db_connector
 from studia3.studia3_mysql import queries
-from studia3 import studia_requests
+from studia3.studia_requests import Studia3Client
+
 import messenger
+import pathlib
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -24,7 +26,8 @@ logger.addHandler(file_handler)
 logger.addHandler(streamHandler)
 
 if __name__ == "__main__":
-    load_dotenv()
+    p = pathlib.Path(__file__).parents[1] / ".env"
+    load_dotenv(dotenv_path=p)
     db = db_connector.DBConnector()
     queries = queries.Queries(db)
 
@@ -39,8 +42,7 @@ if __name__ == "__main__":
                 to_be_notified.append(m_id)
                 logger.info(f"Session expired for id: {m_id}. Inserting null to DB")
             else:
-                client = studia_requests.Studia3Client(maintainer["cookie"])
-                new_exp_date = client.is_logged_in()
+                new_exp_date = Studia3Client.is_logged_in(maintainer["cookie"])
                 logger.debug(
                     f"Value of new_exp_date for {m_id} is {datetime.datetime.fromtimestamp(int(new_exp_date))}")
                 if new_exp_date is False:

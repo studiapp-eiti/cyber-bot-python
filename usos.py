@@ -1,9 +1,12 @@
+import json
+
 from dotenv import load_dotenv
 from db.db_connector import DBConnector
 from usos.usos_api_calls import *
 from usos.objects.user import User
 from usos.usos_mysql.update_tables import update_usos_courses, update_usos_programs, update_usos_points
 from usos.usos_mysql.user_ops import get_usos_users
+import traceback
 
 if __name__ == '__main__':
     load_dotenv()
@@ -20,8 +23,10 @@ if __name__ == '__main__':
             programs.update(get_user_programs(u))
             courses.update(get_user_courses(u))
             points.update(get_user_points(u))
+            print(json.dumps(get_user_usos_id_and_name(u), ensure_ascii=False, indent=2))
         except Exception as err:
-            print(err)
+            print(traceback.format_exc())
+            print(type(err), err)
 
     print('User programs:')
     for i in sorted(programs, key=lambda x: x.program_name_pl):
