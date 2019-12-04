@@ -53,7 +53,7 @@ class Studia3Client:
     @classmethod
     def is_logged_in(cls, session_id_cookie):
         response = cls.get_contents(session_id_cookie, cls.URL_REFRESH_SESSION)
-        data = json.loads(response.text, encoding="UTF-8")
+        data = response.json()
         if data is None:
             return None
         if len(data["time"]) == 0:
