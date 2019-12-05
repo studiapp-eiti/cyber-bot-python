@@ -1,8 +1,6 @@
 from db import db_connector
 from studia3.studia3_mysql.queries import Queries
-import pathlib
 from dotenv import load_dotenv
-from studia3.studia_requests import Studia3Client
 
 
 def init():
@@ -11,7 +9,7 @@ def init():
 
 def get_supported_subjects():
     db = db_connector.DBConnector()
-    q = Queries(db)
+    q = Queries()
     result = q.carry_transaction(q.get_accessible_subject)
     supported_subjects = dict()
     for line in result:
@@ -27,5 +25,6 @@ if __name__ == "__main__":
     init()
     supported_subjects = get_supported_subjects()
     supported = check_if_subject_supported(supported_subjects, "34")
+    print(supported)
     if supported:
         print("This sub is supported")

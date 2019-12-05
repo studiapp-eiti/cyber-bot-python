@@ -1,14 +1,22 @@
 import mysql.connector
 import mysql.connector.errors
-
+from db import db_singleton
 
 class Queries:
-    def __init__(self, db):
+    _INSTANCE = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls._INSTANCE is None:
+            cls._INSTANCE = Queries()
+        return cls._INSTANCE
+    def __init__(self):
         """
 
         :type db: db.DbConnector
         """
-        self.db = db.connection
+
+        self.db = db_singleton.DbConnectorS.get_connection()
         self.cursor = None
 
     def carry_transaction(self, fun, commitable=False):

@@ -8,7 +8,8 @@ import logging
 import re
 
 
-class Studia3Client:
+
+class Studia3Client():
     BASE_URL = "https://studia3.elka.pw.edu.pl/"
     SID_URL = "en/19Z/-/login/"
     LDAP_URL = "en/19Z/-/login-ldap"
@@ -30,7 +31,6 @@ class Studia3Client:
         self.cookie = sid_cookie
         # self.expiration = exp_timestamp
         self.logger = logger
-        self.cookies_dict = {"STUDIA_SID": sid_cookie + "", "STUDIA_COOKIES": "YES"}
         if use_session:
             self.session = requests.Session()
 
