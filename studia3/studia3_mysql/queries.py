@@ -1,6 +1,6 @@
 import mysql.connector
 import mysql.connector.errors
-from db import db_singleton
+from db import db_connector
 
 
 class Queries:
@@ -18,7 +18,7 @@ class Queries:
         :type db: db.DbConnector
         """
 
-        self.db = db_singleton.DbConnectorS.get_connection()
+        self.db = db_connector.DbConnector.get_connection()
         self.cursor = None
 
     def carry_transaction(self, fun, commitable=False):
