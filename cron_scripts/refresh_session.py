@@ -4,6 +4,7 @@ import random
 import time
 from dotenv import load_dotenv
 from db import db_connector
+
 from studia3.studia3_mysql import queries
 from studia3.studia_requests import Studia3Client
 
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-# file_handler = logging.FileHandler('/var/log/cyber_bot/refresh_session_1.log')
+file_handler = logging.FileHandler('/var/log/cyber_bot/refresh_session_1.log')
 file_handler = logging.FileHandler('/var/www/python/1.ss')
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
@@ -29,9 +30,6 @@ logger.addHandler(streamHandler)
 if __name__ == "__main__":
     p = pathlib.Path(__file__).parents[1] / ".env"
     load_dotenv(dotenv_path=p)
-
-    db = db_connector.DBConnector()
-    a = db.connection.cursor(dictionary=True)
     queries = queries.Queries.get_instance()
     maintainers = queries.carry_transaction(queries.get_cookies, False)
     to_be_notified = list()
