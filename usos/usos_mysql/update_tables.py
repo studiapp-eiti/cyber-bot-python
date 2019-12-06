@@ -1,11 +1,10 @@
-from db.db_connector import DBConnector
+from db.db_singleton import DbConnectorS
 
 
-def update_usos_courses(courses: set, connector: DBConnector):
+def update_usos_courses(courses: set):
     """Update `usos_courses` table
 
     :param courses: Set of usos courses
-    :param connector: MySQL DB connector
     """
     columns = [
         'course_id', 'course_name_pl',
@@ -19,16 +18,13 @@ def update_usos_courses(courses: set, connector: DBConnector):
         obj_to_tuple=lambda c: (
             c.course_id, c.course_name_pl,
             c.course_name_en, c.term_id
-        ),
-        connector=connector
-    )
+        ))
 
 
-def update_usos_programs(programs: set, connector: DBConnector):
+def update_usos_programs(programs: set):
     """Update `usos_programs` table
 
     :param programs: Set of usos programs
-    :param connector: MySQL DB connector
     """
     columns = [
         'program_id', 'program_name_pl', 'short_program_name_pl',
@@ -47,7 +43,7 @@ def update_usos_programs(programs: set, connector: DBConnector):
     )
 
 
-def update_usos_points(points: set, connector: DBConnector):
+def update_usos_points(points: set):
     """Update `usos_points` table
 
     It doesn't utilize `generic_update_table()` function because
@@ -55,7 +51,6 @@ def update_usos_points(points: set, connector: DBConnector):
     compilation of `node_id` and `student_id` attributes.
 
     :param points: Set of user points
-    :param connector: MySQL DB connector
     """
     columns = [
         'node_id', 'name', 'points', 'comment',
@@ -88,7 +83,7 @@ def update_usos_points(points: set, connector: DBConnector):
     cursor.close()
 
 
-def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey, obj_to_tuple, connector: DBConnector):
+def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey, obj_to_tuple):
     """Generic function to update tables in database
 
     It searches for objects that aren't in the table yet and inserts them respectively.
@@ -104,8 +99,8 @@ def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey,
     For example: if `columns` is defined as ['pkey', 'name', 'other_attr'], it should look something like this:
     lambda x: (x.pkey, x.name, x.other_attr)
     :type obj_to_tuple: function
-    :param connector: MySQL DB Connector
     """
+    connector = DbConnectorS.get_connection()
     cursor = connector.connection.cursor()
     get_pkeys_query = 'select {} from {};'.format(columns[0], table_name)
     cursor.execute(get_pkeys_query)

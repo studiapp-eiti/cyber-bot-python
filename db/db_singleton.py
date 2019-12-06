@@ -1,30 +1,31 @@
 from os import getenv
+from .db_connector import DBConnector
 import mysql.connector
 
 
-class DBConnector:
-    """Class for handling connection with MySQL database"""
-
-    # Environment variables names
+class DbConnectorS:
+    _CONNECTION = None
     DB_NAME_VARNAME = 'DB_NAME'
     DB_USER_VARNAME = 'DB_USER'
     DB_PASSWD_VARNAME = 'DB_PASSWD'
     DB_HOST_VARNAME = 'DB_HOST'
 
-    # Connection object
-    _CONNECTION = None
+    @classmethod
+    def get_connection(cls):
+        """
 
-    def __init__(self):
+        :rtype: mysql.connector.connection
+        """
+        if cls._CONNECTION is None:
+            cls.log_in()
+        return cls._CONNECTION
+
+    @classmethod
+    def log_in(cls):
         """Setup connection with database"""
-        self.connection = mysql.connector.connect(
+        cls._CONNECTION = mysql.connector.connect(
             user=getenv(DBConnector.DB_USER_VARNAME),
             password=getenv(DBConnector.DB_PASSWD_VARNAME),
             host=getenv(DBConnector.DB_HOST_VARNAME),
             database=getenv(DBConnector.DB_NAME_VARNAME)
         )
-        self.connection.autocommit = False
-
-    def __del__(self):
-        """Close connection if connected"""
-        if self.connection.is_connected():
-            self.connection.close()

@@ -1,7 +1,4 @@
-from studia3.studia_requests import Studia3Client
-import json
-import datetime
-# from mysql_handler import db_handler
+# from studia3_mysql import db_handler
 import logging
 # def obtain_credentials_for_studia3(path):
 #     with open(path, "r") as f:

@@ -7,27 +7,30 @@ import time
 import logging
 import re
 
-class Studia3Client:
+
+
+class Studia3Client():
     BASE_URL = "https://studia3.elka.pw.edu.pl/"
     SID_URL = "en/19Z/-/login/"
     LDAP_URL = "en/19Z/-/login-ldap"
-    BASE_USER_URL = "https://studia3.elka.pw.edu.pl/en/19Z/-/ind/"
+    BASE_USER_URL = "https://studia3.elka.pw.edu.pl/en/19Z/"
     URL_REFRESH_SESSION = "https://studia3.elka.pw.edu.pl/en/19Z/Time/login/"
     URL_BASE_FILE = "https://studia3.elka.pw.edu.pl/file"
     PARAM_URL_PUBLIC = "/pub"
     PARAM_URL_PROTECTED = "/lim"
 
-    def __init__(self, sid_cookie, use_session=False, logger=None, term = "19Z"):
+    COOKIES = {"STUDIA_SID": "", "STUDIA_COOKIES": "YES"}
+
+    def __init__(self, sid_cookie, use_session=False, logger=None, term="19Z"):
         """
 
         :type use_session: bool
         :type logger: logging.Logger
         """
-        self.term = "/"+term
+        self.term = "/" + term
         self.cookie = sid_cookie
         # self.expiration = exp_timestamp
         self.logger = logger
-        self.cookies_dict = {"STUDIA_SID": sid_cookie + "", "STUDIA_COOKIES": "YES"}
         if use_session:
             self.session = requests.Session()
 
@@ -47,55 +50,52 @@ class Studia3Client:
         return len(json.loads(response.text, encoding="UTF=8")["time"]) != 0  # If user is logged in, time parameter
         # will be present
 
-    def is_logged_in(self, times=1, delay=0):
-        cookies = {"STUDIA_SID": self.cookie + "", "STUDIA_COOKIES": "YES"}
-        status = None
-        for _ in range(0, times):
-            try:
-                response = requests.get(self.URL_REFRESH_SESSION, cookies=cookies, timeout=5)
-                status = True
-                break
-            except Exception:
-                print("Request took too long")
-                time.sleep(delay)
-                status = None
-
-        if status is True:
-            parameters = json.loads(response.text, encoding="UTF-8")
-            if len(parameters["time"]) == 0:
-                return False
-            return parameters["end"]
-        return None
-
-    def get_contents(self, url):
-        try:
-            logged_in = self.log_in_for_scrapping()
-        except TimeoutError:
+    @classmethod
+    def is_logged_in(cls, session_id_cookie):
+        response = cls.get_contents(session_id_cookie, cls.URL_REFRESH_SESSION)
+        data = response.json()
+        if data is None:
+            return None
+        if len(data["time"]) == 0:
             return False
-        if logged_in:
-            return self.session.get(url).text
+        return data["end"]
+
+    @staticmethod
+    def get_contents(session_id: str, url: str, timeout=5):
+        """
+        :type: session_id: str
+
+        :rtype: requests.response
+        """
+        cookies = Studia3Client.COOKIES.copy()
+        cookies["STUDIA_SID"] = session_id
+        try:
+            response = requests.get(url, cookies=cookies, timeout=timeout)
+        except Exception:
+            print("Request took too long")
+            return None
+        return response
+
+    @classmethod
+    def get_contents_with_check(cls, session_id, url, timeout=5):
+        if cls.is_logged_in(session_id):
+            return cls.get_contents(session_id, url, timeout)
         return False
 
-    def determine_url_param(self, course):
-        if self.log_in_for_scrapping():
-            public_url = self.build_url(course, self.PARAM_URL_PUBLIC)
-            protected_url = self.build_url(course, self.PARAM_URL_PROTECTED)
-
-
-
-
-            public_contents = self.session.get(public_url).text
-            protected_contents = self.session.get(protected_url).text
-            reg = re.compile(r"(Access denied)")
-            result = None
-            if not reg.search(public_contents):
-                result = "public"
-            if not reg.search(protected_url):
-                result = "protected"
-            if result is None:
-                return False # no access to public or protected pages
-
-
+    @classmethod
+    def get_all_courses_urls(cls, session_id):
+        response = cls.get_contents_with_check(session_id, cls.BASE_USER_URL)
+        if response:
+            ret = dict()
+            matches = list(re.finditer(
+                r'<a.*?href=["\'](?P<url>/file/\d{2}[ZL]/(?P<id>[A-Za-z-\d].+?)/\w.+?/)["\'].+?</a>', response.text))
+            if len(matches) == 0:
+                return None
+            for match in matches:
+                match = match.groupdict()
+                ret[match["id"]] = match["url"]
+            return ret
+        return False
 
     def build_url(self, course_id, man_page_type, path=""):
         return self.URL_BASE_FILE + self.term + course_id + man_page_type + path
