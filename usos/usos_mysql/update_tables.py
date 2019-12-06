@@ -56,7 +56,7 @@ def update_usos_points(points: set):
         'node_id', 'name', 'points', 'comment',
         'grader_id', 'student_id', 'last_changed', 'course_id'
     ]
-
+    connector = DbConnectorS.get_connection()
     cursor = connector.connection.cursor(dictionary=True)
     get_pkeys_query = 'select node_id, student_id from usos_points;'
     cursor.execute(get_pkeys_query)

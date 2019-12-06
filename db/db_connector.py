@@ -11,9 +11,6 @@ class DBConnector:
     DB_PASSWD_VARNAME = 'DB_PASSWD'
     DB_HOST_VARNAME = 'DB_HOST'
 
-    # Connection object
-    _CONNECTION = None
-
     def __init__(self):
         """Setup connection with database"""
         self.connection = mysql.connector.connect(
