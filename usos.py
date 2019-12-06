@@ -3,7 +3,7 @@ from db.db_connector import DBConnector
 from usos.usos_api_calls import *
 from usos.objects.user import User
 from usos.usos_mysql.update_tables import update_usos_courses, update_usos_programs, update_usos_points
-from usos.usos_mysql.user_ops import get_usos_users
+from usos.usos_mysql.user_ops import get_usos_users, check_for_new_points
 import traceback
 
 if __name__ == '__main__':
@@ -20,7 +20,8 @@ if __name__ == '__main__':
         try:
             programs.update(get_user_programs(u))
             courses.update(get_user_courses(u))
-            points.update(get_user_points(u))
+            print('Checking for new and modified points...')
+            check_for_new_points(u, usos_mysql_connector)
         except Exception as err:
             print(traceback.format_exc())
             print(type(err), err)
@@ -51,6 +52,8 @@ if __name__ == '__main__':
     print('\nUpdating user_points table...')
     update_usos_points(points, usos_mysql_connector)
     print('Done.')
+
+
 
     # print('\nUser points:')
     # user_points = get_user_points(test_user)

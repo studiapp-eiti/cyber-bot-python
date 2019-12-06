@@ -70,7 +70,6 @@ def update_usos_points(points: set, connector: DBConnector):
     insert_data = []
     for p in points:
         if hash((str(p.node_id), str(p.student_id))) not in pkeys:
-            print('Adding', p.node_id, p.student_id)
             insert_data.append((
                 p.node_id, p.name, p.points, p.comment,
                 p.grader_id, p.student_id, p.last_changed, p.course_id

@@ -19,6 +19,7 @@ class DBConnector:
             host=getenv(DBConnector.DB_HOST_VARNAME),
             database=getenv(DBConnector.DB_NAME_VARNAME)
         )
+        self.connection.autocommit = False
 
     def __del__(self):
         """Close connection if connected"""

@@ -1,5 +1,8 @@
 from db.db_connector import DBConnector
+from usos.objects.points import Points
 from usos.objects.user import User
+from usos.usos_api_calls import get_user_points
+from usos.usos_mysql.update_tables import update_usos_points
 
 
 def get_usos_users(connector: DBConnector, user_ids: list = None) -> list:
@@ -36,3 +39,50 @@ def get_usos_users(connector: DBConnector, user_ids: list = None) -> list:
     cursor.close()
 
     return users
+
+
+def check_for_new_points(user: User, connector: DBConnector):
+    columns = [
+        'name', 'points', 'comment', 'grader_id', 'node_id',
+        'student_id', 'last_changed', 'course_id'
+    ]
+    get_points_query = 'select {} from usos_points ' \
+                       'where student_id = %s;'.format(', '.join(columns))
+    cursor = connector.connection.cursor(dictionary=True)
+    cursor.execute(get_points_query, (user.usos_id,))
+
+    points_from_db = {Points(**i) for i in cursor}
+    points_from_api = get_user_points(user)
+
+    modified_points = set()
+    new_points = set()
+    for p_api in points_from_api:
+        p_db = [x for x in points_from_db if x == p_api]
+        if len(p_db) == 0:  # If there's no equivalent of p_api in DB
+            new_points.add(p_api)
+        elif p_db[0].last_changed != p_api.last_changed:
+            modified_points.add(p_api)
+
+    if len(new_points) != 0:
+        update_usos_points(new_points, connector)
+
+    if len(modified_points) != 0:
+        update_points_query = 'update usos_points set points = %s, comment = %s, last_changed = %s ' \
+                              'where node_id = %s and student_id = %s;'
+        for p in modified_points:
+            cursor.execute(update_points_query, (
+                p.points, p.comment, p.last_changed,
+                p.node_id, p.student_id
+            ))
+        connector.connection.commit()
+
+    # TODO: Send notification to user
+    print('New points:')
+    for n in new_points:
+        print(n.course_id, n.name, n.points, n.comment)
+
+    print('Modified points:')
+    for m in modified_points:
+        print(m.course_id, m.name, m.points, m.comment)
+
+    cursor.close()
