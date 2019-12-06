@@ -2,6 +2,7 @@ from os import getenv
 from .db_connector import DBConnector
 import mysql.connector
 
+
 class DbConnectorS:
     _CONNECTION = None
     DB_NAME_VARNAME = 'DB_NAME'
@@ -11,6 +12,10 @@ class DbConnectorS:
 
     @classmethod
     def get_connection(cls):
+        """
+
+        :rtype: mysql.connector.connection
+        """
         if cls._CONNECTION is None:
             cls.log_in()
         return cls._CONNECTION

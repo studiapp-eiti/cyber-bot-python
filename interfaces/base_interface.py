@@ -2,37 +2,29 @@ from abc import ABC, abstractmethod
 from . import studia_interface
 
 
-class HttpInterface:
+class AuthenticationInterface:
     INTERFACES = {"Studia3": studia_interface.Studia3Interface, "HttpAuth": None}
+
+    @abstractmethod
+    def get_request_parameters(self, existing_parameters=None):
+        """
+
+        :rtype: dict(request_parameters)
+        """
+        pass
 
     @abstractmethod
     def supported_subjects(self):
         """
-        This function should return list of supported subjects, and should be called in the constructor.
-
-        :rtype: list(int)
-        """
-        pass
-
-    @abstractmethod
-    def get_contents(self, url, timeout=5):
-        """
-        :type url: str
-        :rtype: requests.response
-        """
-        pass
-
-    def get_scrapping_data(self, url, timeout=5):
-        """
-        :type url: str
-        :type timeout: int
-        :rtype str (requests.response.text)
+        This function should return object containing supported subjects, and should be called in the constructor.
+        It can be dictionary or list, depending on situation.
         """
         pass
 
     def subject_supported(self, s_id):
         """
         This function checks if subject is supported. Should be called in constructor of child class.
+        If subject is not supported it should throw ValueError.
         :type s_id: int
         """
         pass
@@ -45,8 +37,6 @@ class HttpInterface:
             raise ValueError(f"Provided not correct http_interface name ({interface_name})") from e
 
     @classmethod
-    def create_interface(cls, interface_name, subject_id, queries):
+    def from_name(cls, interface_name, subject_id, options=None):
         interface = cls.determine_interface(interface_name)
-        return interface({"subject_id": subject_id, "queries": queries})
-
-
+        return interface({"subject_id": subject_id, "options": options})

@@ -5,7 +5,7 @@ import time
 from dotenv import load_dotenv
 from db import db_connector
 from studia3.studia3_mysql import queries
-from interfaces.studia_requests import Studia3Client
+from studia3.studia_requests import Studia3Client
 
 import messenger
 import pathlib

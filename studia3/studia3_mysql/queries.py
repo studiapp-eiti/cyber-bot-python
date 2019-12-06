@@ -2,6 +2,7 @@ import mysql.connector
 import mysql.connector.errors
 from db import db_singleton
 
+
 class Queries:
     _INSTANCE = None
 
@@ -10,6 +11,7 @@ class Queries:
         if cls._INSTANCE is None:
             cls._INSTANCE = Queries()
         return cls._INSTANCE
+
     def __init__(self):
         """
 
