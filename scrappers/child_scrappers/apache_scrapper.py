@@ -1,4 +1,0 @@
-
-
-class ApacheIndexesScrapper(Scrapper):
-    pass

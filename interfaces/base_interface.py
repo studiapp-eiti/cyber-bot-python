@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from . import studia_interface
+
 
 
 class AuthenticationInterface:
-    INTERFACES = {"Studia3": studia_interface.Studia3Interface, "HttpAuth": None}
+
 
     @abstractmethod
     def get_request_parameters(self, existing_parameters=None):
@@ -29,14 +29,4 @@ class AuthenticationInterface:
         """
         pass
 
-    @classmethod
-    def determine_interface(cls, interface_name):
-        try:
-            return cls.INTERFACES[interface_name]
-        except KeyError as e:
-            raise ValueError(f"Provided not correct http_interface name ({interface_name})") from e
 
-    @classmethod
-    def from_name(cls, interface_name, subject_id, options=None):
-        interface = cls.determine_interface(interface_name)
-        return interface({"subject_id": subject_id, "options": options})

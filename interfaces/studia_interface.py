@@ -15,13 +15,13 @@ class Studia3Interface(AuthenticationInterface):
         result = query.carry_transaction(query.get_accessible_subject)
         supported_subjects = dict()
         for line in result:
-            supported_subjects[line["cookie"]] = line["usos_courses"].split(";")
+            supported_subjects[line["cookie"]] = [int(x) for x in line["usos_courses"].split(";")]
         return supported_subjects
 
     def subject_supported(self, s_id):
         result = next((k for k, v in self.subjects.items() if s_id in v), False)
         if result is False:
-            raise ValueError(f"This subject ({s_id}) is not supported by the {self.__name__}")
+            raise ValueError(f"This subject ({s_id}) is not supported by the {__name__}")
         return result
 
     def get_request_parameters(self, r_parameters=None):
@@ -31,5 +31,6 @@ class Studia3Interface(AuthenticationInterface):
         cookies = self.COOKIES.copy()
         cookies["STUDIA_SID"] = self.cookie_session_id
         r_parameters["cookies"] = cookies
-        return r_parameters
+
+        return dict(params=r_parameters)
 
