@@ -3,6 +3,7 @@ from usos.objects.points import Points
 from usos.objects.user import User
 from usos.usos_api_calls import get_user_points
 from usos.usos_mysql.update_tables import update_usos_points
+from messenger import Notifier
 
 
 @db_operation
@@ -16,7 +17,7 @@ def get_usos_users(user_ids: list = None) -> list:
 
     # Column names
     columns = [
-        'fb_first_name', 'fb_last_name', 'nickname', 'gender',
+        'id', 'fb_first_name', 'fb_last_name', 'nickname', 'gender',
         'usos_first_name', 'usos_last_name', 'usos_id', 'usos_courses',
         'usos_token', 'usos_token_secret', 'locale', 'is_registered'
     ]
@@ -35,6 +36,8 @@ def get_usos_users(user_ids: list = None) -> list:
 
     for user_data in cursor:
         if user_data['is_registered']:
+            user_data['id_'] = user_data['id']
+            del user_data['id']
             users.append(User(**user_data))
 
     cursor.close()
@@ -82,6 +85,9 @@ def check_for_new_points(user: User):
     print('New points:')
     for n in new_points:
         print(n.course_id, n.name, n.points, n.comment)
+
+    notifier = Notifier([user.id])
+    notifier.new_points([n for n in new_points])
 
     print('Modified points:')
     for m in modified_points:
