@@ -1,4 +1,4 @@
-from db.db_singleton import DbConnectorS
+from db.db_connector import DbConnector, db_operation
 
 
 def update_usos_courses(courses: set):
@@ -38,11 +38,10 @@ def update_usos_programs(programs: set):
         obj_to_tuple=lambda p: (
             p.program_id, p.program_name_pl, p.short_program_name_pl,
             p.program_name_en, p.short_program_name_en
-        ),
-        connector=connector
-    )
+        ))
 
 
+@db_operation
 def update_usos_points(points: set):
     """Update `usos_points` table
 
@@ -56,8 +55,8 @@ def update_usos_points(points: set):
         'node_id', 'name', 'points', 'comment',
         'grader_id', 'student_id', 'last_changed', 'course_id'
     ]
-    connector = DbConnectorS.get_connection()
-    cursor = connector.connection.cursor(dictionary=True)
+    connection = DbConnector.get_connection()
+    cursor = connection.cursor(dictionary=True)
     get_pkeys_query = 'select node_id, student_id from usos_points;'
     cursor.execute(get_pkeys_query)
 
@@ -79,10 +78,11 @@ def update_usos_points(points: set):
     )
 
     cursor.executemany(insert_new_data, insert_data)
-    connector.connection.commit()
+    connection.commit()
     cursor.close()
 
 
+@db_operation
 def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey, obj_to_tuple):
     """Generic function to update tables in database
 
@@ -100,8 +100,8 @@ def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey,
     lambda x: (x.pkey, x.name, x.other_attr)
     :type obj_to_tuple: function
     """
-    connector = DbConnectorS.get_connection()
-    cursor = connector.connection.cursor()
+    connection = DbConnector.get_connection()
+    cursor = connection.cursor()
     get_pkeys_query = 'select {} from {};'.format(columns[0], table_name)
     cursor.execute(get_pkeys_query)
 
@@ -120,5 +120,5 @@ def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey,
     )
 
     cursor.executemany(insert_new_data, insert_data)
-    connector.connection.commit()
+    connection.commit()
     cursor.close()

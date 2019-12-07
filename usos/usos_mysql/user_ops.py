@@ -1,17 +1,18 @@
-from db.db_connector import DBConnector
+from db.db_connector import DbConnector, db_operation
 from usos.objects.points import Points
 from usos.objects.user import User
 from usos.usos_api_calls import get_user_points
 from usos.usos_mysql.update_tables import update_usos_points
 
 
-def get_usos_users(connector: DBConnector, user_ids: list = None) -> list:
+@db_operation
+def get_usos_users(user_ids: list = None) -> list:
     """Get all users from DB and convert to User objects
 
-    :param connector: MySQL DB connector
     :param user_ids: List of user_ids to get from DB. Omit this parameter if you want to get all users
     :returns: List of User objects
     """
+    connection = DbConnector.get_connection()
 
     # Column names
     columns = [
@@ -21,7 +22,7 @@ def get_usos_users(connector: DBConnector, user_ids: list = None) -> list:
     ]
 
     users = []
-    cursor = connector.connection.cursor(dictionary=True)
+    cursor = connection.cursor(dictionary=True)
 
     if user_ids is None:
         query = 'select {} from users;'.format(', '.join(columns))
@@ -41,14 +42,16 @@ def get_usos_users(connector: DBConnector, user_ids: list = None) -> list:
     return users
 
 
-def check_for_new_points(user: User, connector: DBConnector):
+def check_for_new_points(user: User):
+    connection = DbConnector.get_connection()
+
     columns = [
         'name', 'points', 'comment', 'grader_id', 'node_id',
         'student_id', 'last_changed', 'course_id'
     ]
     get_points_query = 'select {} from usos_points ' \
                        'where student_id = %s;'.format(', '.join(columns))
-    cursor = connector.connection.cursor(dictionary=True)
+    cursor = connection.cursor(dictionary=True)
     cursor.execute(get_points_query, (user.usos_id,))
 
     points_from_db = {Points(**i) for i in cursor}
@@ -64,7 +67,7 @@ def check_for_new_points(user: User, connector: DBConnector):
             modified_points.add(p_api)
 
     if len(new_points) != 0:
-        update_usos_points(new_points, connector)
+        update_usos_points(new_points)
 
     if len(modified_points) != 0:
         update_points_query = 'update usos_points set points = %s, comment = %s, last_changed = %s ' \
@@ -74,7 +77,6 @@ def check_for_new_points(user: User, connector: DBConnector):
                 p.points, p.comment, p.last_changed,
                 p.node_id, p.student_id
             ))
-        connector.connection.commit()
 
     # TODO: Send notification to user
     print('New points:')
