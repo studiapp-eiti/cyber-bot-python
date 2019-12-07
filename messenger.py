@@ -31,8 +31,7 @@ class Notifier:
     def call_api(self, other_params):
         payload = ({"user_ids": self.users})
         payload.update(other_params)
-        data = json.dumps(payload)
-        response = requests.post(self.url, json=data, headers=self.HEADERS, verify=False)
+        response = requests.post(self.url, json=payload, headers=self.HEADERS, verify=False)
         return response.status_code == 200
 
     def message_session_expired(self):
