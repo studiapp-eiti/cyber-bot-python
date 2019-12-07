@@ -38,16 +38,29 @@ class Notifier:
                       [{"title": "Log in", "url": self.log_in_url}, ]}
         return self.call_api(params)
 
-    def message_new_points(self, points):
+    def message_new_points(self, points) -> bool:
         """Send notification about new points on USOS
 
         :param points: List of new points
         :type points: list[Points]
+        :returns: `True` when notification was successfully sent, `False` otherwise
         """
-        points_text = '\n'.join([
-            '[{}] {}: {} points'.format(p.course_id.split('-')[-1], p.name, p.points)
-            for p in points
-        ])
+        points_text = str()
+        if len(points) == 1:
+            points_text = 'Hey $user.name, you have new points from {}.\n{}: {}'.format(
+                points[0].course_id.split('-')[-1], points[0].name, points[0].points
+            )
+        elif len(points) > 1:
+            points_text = 'Hey $user.name, you have new points.'
+            course_ids = {p.course_id for p in points}
+            for course_id in sorted(course_ids):
+                related_points = sorted([p for p in points if p.course_id == course_id], key=lambda x: x.name)
+                points_text += '\n\n[{}]\n{}'.format(
+                    course_id.split('-')[-1],
+                    '\n'.join(['{}: {}'.format(rp.name, rp.points) for rp in related_points])
+                )
+        else:
+            return False
 
-        params = {"text": 'Hey $user.name, you have new points!\n' + points_text}
+        params = {"text": points_text}
         return self.call_api(params)
