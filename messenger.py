@@ -1,6 +1,4 @@
 import requests
-import json
-from pathlib import Path
 from urllib3.exceptions import InsecureRequestWarning
 import ssl
 from os import getenv
@@ -40,7 +38,16 @@ class Notifier:
                       [{"title": "Log in", "url": self.log_in_url}, ]}
         return self.call_api(params)
 
-    def new_points(self, points: list):
-        points_text = '\n'.join(['[{self.course_id}] {self.name}: {self.points} points'.format(self=p) for p in points])
-        params = {"text": "Hey, $user.name you have new points!\n" + points_text, "message_type": "text"}
+    def message_new_points(self, points):
+        """Send notification about new points on USOS
+
+        :param points: List of new points
+        :type points: list[Points]
+        """
+        points_text = '\n'.join([
+            '[{}] {}: {} points'.format(p.course_id.split('-')[-1], p.name, p.points)
+            for p in points
+        ])
+
+        params = {"text": 'Hey $user.name, you have new points!\n' + points_text}
         return self.call_api(params)

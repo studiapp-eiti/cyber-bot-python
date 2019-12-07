@@ -87,7 +87,7 @@ def check_for_new_points(user: User):
         print(n.course_id, n.name, n.points, n.comment)
 
     notifier = Notifier([user.id])
-    notifier.new_points([n for n in new_points])
+    notifier.message_new_points([n for n in new_points])
 
     print('Modified points:')
     for m in modified_points:
