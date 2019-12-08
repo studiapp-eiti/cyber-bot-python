@@ -45,12 +45,7 @@ class Notifier:
         :type points: list[Points]
         :returns: `True` when notification was successfully sent, `False` otherwise
         """
-        points_text = str()
-        if len(points) == 1:
-            points_text = 'Hey $user.name, you have new points from {}.\n{}: {}'.format(
-                points[0].course_id.split('-')[-1], points[0].name, points[0].points
-            )
-        elif len(points) > 1:
+        if len(points) != 0:
             points_text = 'Hey $user.name, you have new points.'
             course_ids = {p.course_id for p in points}
             for course_id in sorted(course_ids):
@@ -59,8 +54,8 @@ class Notifier:
                     course_id.split('-')[-1],
                     '\n'.join(['{}: {}'.format(rp.name, rp.points) for rp in related_points])
                 )
+
+            params = {"text": points_text}
+            return self.call_api(params)
         else:
             return False
-
-        params = {"text": points_text}
-        return self.call_api(params)
