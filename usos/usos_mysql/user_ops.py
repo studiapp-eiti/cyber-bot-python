@@ -45,13 +45,14 @@ def get_usos_users(user_ids: list = None) -> list:
     return users
 
 
-def get_new_and_modified_points(user: User) -> dict:
+def get_new_and_modified_points(user: User) -> tuple:
     """Get all points scored by given user and return new and modified ones
 
     Compare points fetched from API and those that are in the DB and look for differences
 
     :param user: User that has an active session
-    :returns: Dict in format {'new_points': set[Points], 'mod_points': set[Points]}
+    :returns: Tuple in format (new_points, modified_points)
+    :rtype: (set[Points], set[Points])
     """
     connection = DbConnector.get_connection()
 
@@ -78,4 +79,4 @@ def get_new_and_modified_points(user: User) -> dict:
 
     cursor.close()
 
-    return {'new_points': new_points, 'mod_points': modified_points}
+    return new_points, modified_points
