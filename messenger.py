@@ -1,6 +1,4 @@
 import requests
-import json
-from pathlib import Path
 from urllib3.exceptions import InsecureRequestWarning
 import ssl
 from os import getenv
@@ -31,7 +29,6 @@ class Notifier:
     def call_api(self, other_params):
         payload = ({"user_ids": self.users})
         payload.update(other_params)
-        # data = json.dumps(payload)
         response = requests.post(self.url, json=payload, headers=self.HEADERS, verify=False)
         return response.status_code == 200
 
@@ -41,7 +38,24 @@ class Notifier:
                       [{"title": "Log in", "url": self.log_in_url}, ]}
         return self.call_api(params)
 
-    def new_points(self, points: list):
-        points_text = '\n'.join(['[{self.course_id}] {self.name}: {self.points} points'.format(self=p) for p in points])
-        params = {"text": "Hey, $user.name you have new points!\n" + points_text, "message_type": "text"}
-        return self.call_api(params)
+    def message_new_points(self, points) -> bool:
+        """Send notification about new points on USOS
+
+        :param points: List of new points
+        :type points: list[Points]
+        :returns: `True` when notification was successfully sent, `False` otherwise
+        """
+        if len(points) != 0:
+            points_text = 'Hey $user.name, you have new points.'
+            course_ids = {p.course_id for p in points}
+            for course_id in sorted(course_ids):
+                related_points = sorted([p for p in points if p.course_id == course_id], key=lambda x: x.name)
+                points_text += '\n\n[{}]\n{}'.format(
+                    course_id.split('-')[-1],
+                    '\n'.join(['{}: {}'.format(rp.name, rp.points) for rp in related_points])
+                )
+
+            params = {"text": points_text}
+            return self.call_api(params)
+        else:
+            return False

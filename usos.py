@@ -1,19 +1,15 @@
-import json
-
+import requests
 from dotenv import load_dotenv
-from db.db_connector import DBConnector
 from usos.usos_api_calls import *
 from usos.objects.user import User
-from usos.usos_mysql.update_tables import update_usos_courses, update_usos_programs, update_usos_points
+from usos.usos_mysql.update_tables import update_usos_courses, update_usos_programs, update_new_usos_points
 from usos.usos_mysql.user_ops import get_usos_users
-import traceback
 
 if __name__ == '__main__':
     load_dotenv()
 
     User.get_usos_api_key()
-    usos_mysql_connector = DBConnector()
-    users = get_usos_users(usos_mysql_connector)
+    users = get_usos_users()
 
     courses = set()
     programs = set()
@@ -23,10 +19,8 @@ if __name__ == '__main__':
             programs.update(get_user_programs(u))
             courses.update(get_user_courses(u))
             points.update(get_user_points(u))
-            print(json.dumps(get_user_usos_id_and_name(u), ensure_ascii=False, indent=2))
-        except Exception as err:
-            print(traceback.format_exc())
-            print(type(err), err)
+        except requests.exceptions.ConnectionError as err:
+            print(err)
 
     print('User programs:')
     for i in sorted(programs, key=lambda x: x.program_name_pl):
@@ -44,24 +38,13 @@ if __name__ == '__main__':
         print(i.course_id, i.name, i.points, sep=' - ')
 
     print('\nUpdating user_programs table...')
-    update_usos_programs(programs, usos_mysql_connector)
+    update_usos_programs(programs)
     print('Done.')
 
     print('\nUpdating user_courses table...')
-    update_usos_courses(courses, usos_mysql_connector)
+    update_usos_courses(courses,)
     print('Done.')
 
     print('\nUpdating user_points table...')
-    update_usos_points(points, usos_mysql_connector)
+    update_new_usos_points(points)
     print('Done.')
-
-    # print('\nUser points:')
-    # user_points = get_user_points(test_user)
-    # for course, points in user_points.items():
-    #     print(course)
-    #     for point in points:
-    #         print('\t{} - Score: {} points [{}]'.format(point.name, point.points, point.comment))
-    #
-    # print('\nUser timetable for tomorrow:')
-    # tt = get_timetable_for_tommorow(test_user)
-    # print(tt)

@@ -1,14 +1,20 @@
+from datetime import datetime
+
+
 class Points:
     """Class for holding information about points scored by user in a certain test"""
 
     def __init__(self, name, points, last_changed, comment, grader_id, node_id, student_id, course_id):
         self.name = name
         self.points = points
-        self.last_changed = last_changed
+        if type(last_changed) == datetime:
+            self.last_changed = last_changed
+        else:
+            self.last_changed = datetime.fromisoformat(last_changed)
         self.comment = comment
-        self.grader_id = grader_id
-        self.node_id = node_id
-        self.student_id = student_id
+        self.grader_id = str(grader_id)
+        self.node_id = str(node_id)
+        self.student_id = str(student_id)
         self.course_id = course_id
 
     @classmethod

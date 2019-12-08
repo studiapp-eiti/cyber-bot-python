@@ -26,13 +26,14 @@ class User:
     _consumer_key = None
     _consumer_secret = None
 
-    def __init__(self, fb_first_name, fb_last_name, nickname, gender, usos_id,
+    def __init__(self, id_, fb_first_name, fb_last_name, nickname, gender, usos_id,
                  usos_first_name, usos_last_name, usos_token, usos_token_secret,
                  usos_courses, locale, is_registered):
         """Constructs new User object.
 
         Check for environment variables is issued before attempt to get user OAuth session
         """
+        self.id = id_
         self.fb_first_name = fb_first_name
         self.fb_last_name = fb_last_name
         self.usos_first_name = usos_first_name
