@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 
 from interfaces import interface_creator
-
+from interfaces import base_interface
 
 class Scrapper(ABC):
 
     @classmethod
-    def get_auth_interface(cls, name, subject_id, options = None):
+    def get_auth_interface(cls, name, subject_id, options = None) -> base_interface.AuthenticationInterface:
         """
 
         :type name: str

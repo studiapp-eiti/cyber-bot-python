@@ -7,7 +7,7 @@ class Studia3Interface(AuthenticationInterface):
     COOKIES = {"STUDIA_SID": "", "STUDIA_COOKIES": "YES"}
 
     def __init__(self, subject_id, *args, **kwargs):
-        self.subjects = self.supported_subjects()
+        self.supported_subjects = self.supported_subjects()
         self.cookie_session_id = self.subject_supported(subject_id)
 
     def supported_subjects(self):
@@ -19,18 +19,17 @@ class Studia3Interface(AuthenticationInterface):
         return supported_subjects
 
     def subject_supported(self, s_id):
-        result = next((k for k, v in self.subjects.items() if s_id in v), False)
+        result = next((k for k, v in self.supported_subjects.items() if s_id in v), False)
         if result is False:
             raise ValueError(f"This subject ({s_id}) is not supported by the {__name__}")
         return result
 
-    def get_request_parameters(self, r_parameters=None):
-        if r_parameters is None:
-            r_parameters = dict()
+    def append_GET_parameters(self, existing_parameters: dict = None) -> dict:
+        if existing_parameters is None:
+            existing_parameters = dict()
 
         cookies = self.COOKIES.copy()
         cookies["STUDIA_SID"] = self.cookie_session_id
-        r_parameters["cookies"] = cookies
+        existing_parameters["cookies"] = cookies
 
-        return dict(params=r_parameters)
-
+        return dict(params=existing_parameters)

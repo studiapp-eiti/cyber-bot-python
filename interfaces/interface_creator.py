@@ -1,9 +1,10 @@
 from .studia_interface import Studia3Interface
-
+from .base_interface import AuthenticationInterface
 
 
 class InterfaceCreator:
-    INTERFACES = {"Studia3": Studia3Interface, "HttpAuth": None}
+    INTERFACES = {"Studia3": Studia3Interface,
+                  "HttpAuth": None}
 
     @classmethod
     def determine_interface(cls, interface_name):
@@ -13,9 +14,6 @@ class InterfaceCreator:
             raise ValueError(f"Provided not correct http_interface name ({interface_name})") from e
 
     @classmethod
-    def from_name(cls, interface_name, subject_id, options=None):
+    def from_name(cls, interface_name, subject_id, options=None) -> AuthenticationInterface:
         inter = cls.determine_interface(interface_name)
-        print(inter)
-        abb = inter(subject_id, options)
-        print(abb)
-        return abb
+        return inter(subject_id, options)

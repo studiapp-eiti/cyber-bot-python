@@ -1,11 +1,9 @@
 import requests
 import os
-from scrappers import base_scrapper
-from interfaces import base_interface
+from scrappers.base_scrapper import Scrapper
 
-# os.path.append(":")
 
-class GenericScrapper(base_scrapper.Scrapper):
+class GenericScrapper(Scrapper):
     TIMEOUT = 5
 
     def __init__(self, subject_id, root_urls, *args, **kwargs):
@@ -26,12 +24,10 @@ class GenericScrapper(base_scrapper.Scrapper):
 
         if len(interface) != 0:
             i = self.get_auth_interface(interface["name"], self.subject_id)
-            i.get_request_parameters(request_parameters)
+            i.append_GET_parameters(request_parameters)
 
-        for site_name, path in url_obj["sub_paths"].items():
+        for path_obj in url_obj["sub_paths"]:
             parameters = request_parameters.copy()
-            result = requests.get(base_url + path, **parameters)
-            responses[path] = result.text
+            result = requests.get(base_url + path_obj["path"], **parameters)
+            responses[(path_obj["path"], path_obj["name"])] = result.text
         return responses
-
-

@@ -6,7 +6,7 @@ class AuthenticationInterface:
 
 
     @abstractmethod
-    def get_request_parameters(self, existing_parameters=None):
+    def append_GET_parameters(self, existing_parameters=None):
         """
 
         :rtype: dict(request_parameters)
