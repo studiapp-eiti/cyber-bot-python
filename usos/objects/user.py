@@ -1,9 +1,11 @@
 import os
 import rauth
+import time
 
 
 def api_req(req):
     def catch_errors(*args, **kwargs):
+        time.sleep(0.05)  # Sleep for 50ms so API won't drop packets
         r = req(*args, **kwargs)
         if r.status_code == 400:
             raise RuntimeError('HTTP 400 Bad Request for: {}\nResponse message: {}'.format(r.url, r.json()['message']))
