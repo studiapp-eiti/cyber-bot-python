@@ -1,4 +1,5 @@
 from db.db_connector import DbConnector, db_operation
+from usos.objects.user import User
 
 
 def update_usos_courses(courses: set):
@@ -42,8 +43,8 @@ def update_usos_programs(programs: set):
 
 
 @db_operation
-def update_usos_points(points: set):
-    """Update `usos_points` table
+def update_new_usos_points(points: set):
+    """Insert new points into `usos_points` table
 
     It doesn't utilize `generic_update_table()` function because
     it doesn't have a single primary key. In this case it's
@@ -79,6 +80,24 @@ def update_usos_points(points: set):
 
     cursor.executemany(insert_new_data, insert_data)
     connection.commit()
+    cursor.close()
+
+
+@db_operation
+def update_modified_usos_points(points: set, user: User):
+    """Update `usos_points` table with new points, comment and last changed time
+
+    :param points: Set with points that were modified
+    :param user: User to whom the points belong
+    """
+    update_query = 'update usos_points set points = %s, comment = %s, last_changed = %s ' \
+                   'where node_id = %s and student_id = %s;'
+    cursor = DbConnector.get_connection().cursor()
+    for p in points:
+        cursor.execute(update_query, (
+            p.points, p.comment, p.last_changed, p.node_id, user.usos_id
+        ))
+
     cursor.close()
 
 
