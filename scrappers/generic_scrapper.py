@@ -19,12 +19,14 @@ class GenericScrapper(Scrapper):
     def scrap_url(self, url_obj):
         base_url = url_obj["url"]
         request_parameters = {"timeout": self.TIMEOUT}
-        interface = url_obj["interface"]
         responses = dict()
 
-        if len(interface) != 0:
-            i = self.get_auth_interface(interface["name"], self.subject_id)
-            i.append_GET_parameters(request_parameters)
+
+        if "interface" in url_obj:
+            interface = url_obj["interface"]
+            if len(interface) != 0:
+                i = self.get_auth_interface(interface["name"], self.subject_id)
+                i.append_GET_parameters(request_parameters)
 
         for path_obj in url_obj["sub_paths"]:
             parameters = request_parameters.copy()
