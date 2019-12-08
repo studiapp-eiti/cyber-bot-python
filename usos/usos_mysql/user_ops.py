@@ -2,8 +2,6 @@ from db.db_connector import DbConnector, db_operation
 from usos.objects.points import Points
 from usos.objects.user import User
 from usos.usos_api_calls import get_user_points
-from usos.usos_mysql.update_tables import update_usos_points
-from messenger import Notifier
 
 
 @db_operation

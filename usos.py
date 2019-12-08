@@ -2,9 +2,8 @@ import requests
 from dotenv import load_dotenv
 from usos.usos_api_calls import *
 from usos.objects.user import User
-from usos.usos_mysql.update_tables import update_usos_courses, update_usos_programs, update_usos_points
-from usos.usos_mysql.user_ops import get_usos_users, check_for_new_points
-import traceback
+from usos.usos_mysql.update_tables import update_usos_courses, update_usos_programs, update_new_usos_points
+from usos.usos_mysql.user_ops import get_usos_users
 
 if __name__ == '__main__':
     load_dotenv()
@@ -19,10 +18,8 @@ if __name__ == '__main__':
         try:
             programs.update(get_user_programs(u))
             courses.update(get_user_courses(u))
-            print('Checking for new and modified points...')
-            check_for_new_points(u)
+            points.update(get_user_points(u))
         except requests.exceptions.ConnectionError as err:
-            # print(traceback.format_exc())
             print(err)
 
     print('User programs:')
@@ -49,18 +46,5 @@ if __name__ == '__main__':
     print('Done.')
 
     print('\nUpdating user_points table...')
-    update_usos_points(points)
+    update_new_usos_points(points)
     print('Done.')
-
-
-
-    # print('\nUser points:')
-    # user_points = get_user_points(test_user)
-    # for course, points in user_points.items():
-    #     print(course)
-    #     for point in points:
-    #         print('\t{} - Score: {} points [{}]'.format(point.name, point.points, point.comment))
-    #
-    # print('\nUser timetable for tomorrow:')
-    # tt = get_timetable_for_tommorow(test_user)
-    # print(tt)
