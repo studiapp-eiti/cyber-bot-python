@@ -45,7 +45,14 @@ def get_usos_users(user_ids: list = None) -> list:
     return users
 
 
-def check_for_new_points(user: User):
+def get_new_and_modified_points(user: User) -> dict:
+    """Get all points scored by given user and return new and modified ones
+
+    Compare points fetched from API and those that are in the DB and look for differences
+
+    :param user: User that has an active session
+    :returns: Dict in format {'new_points': set[Points], 'mod_points': set[Points]}
+    """
     connection = DbConnector.get_connection()
 
     columns = [
@@ -69,28 +76,6 @@ def check_for_new_points(user: User):
         elif p_db[0].last_changed != p_api.last_changed:
             modified_points.add(p_api)
 
-    if len(new_points) != 0:
-        update_usos_points(new_points)
-
-    if len(modified_points) != 0:
-        update_points_query = 'update usos_points set points = %s, comment = %s, last_changed = %s ' \
-                              'where node_id = %s and student_id = %s;'
-        for p in modified_points:
-            cursor.execute(update_points_query, (
-                p.points, p.comment, p.last_changed,
-                p.node_id, p.student_id
-            ))
-
-    # TODO: Send notification to user
-    print('New points:')
-    for n in new_points:
-        print(n.course_id, n.name, n.points, n.comment)
-
-    notifier = Notifier([user.id])
-    notifier.message_new_points([n for n in new_points])
-
-    print('Modified points:')
-    for m in modified_points:
-        print(m.course_id, m.name, m.points, m.comment)
-
     cursor.close()
+
+    return {'new_points': new_points, 'mod_points': modified_points}
