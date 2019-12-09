@@ -23,14 +23,14 @@ if __name__ == "__main__":
     scrapper = None
 
     if data:
-        course = data["courses"][0]
+        course = data["courses"][1]
         id_ = course["id"]
         for scrapper_content in course["scrappers"]:
             scrapper = scrapper_creator.ScrapperCreator.from_json(scrapper_content, id_)
             scrapper.iter_urls()
 
-for base_url, child_urls in scrapper.data.items():
-    print(f"{bcolors.FAIL}Subpath content for url: {base_url} {bcolors.ENDC}")
-    for path, content in child_urls.items():
-        print(f"{bcolors.WARNING}Path name: {path[1]} \nurl: {path[0]}  {bcolors.ENDC}")
-        print(content)
+        for base_url, child_urls in scrapper.data.items():
+            print(f"{bcolors.FAIL}Subpath content for url: {base_url} {bcolors.ENDC}")
+            for path, content in child_urls.items():
+                print(f"{bcolors.WARNING}Path name: {path} {bcolors.ENDC}")
+                print(content)
