@@ -9,6 +9,7 @@ from scrappers.base_scrapper import Scrapper
 class GenericScrapper(Scrapper):
     TIMEOUT = 5
 
+    #TODO Add support for include regex and exclude regex
     def __init__(self, subject_id, root_urls, *args, **kwargs):
         self.subject_id = subject_id
         self.root_urls = root_urls
