@@ -1,42 +1,59 @@
 {
-  "global_confguration":{
-
+  "global_configuration": {
   },
-  "courses":[
+  "courses": [
     {
-      "id":33,
-      "scrappers":[
+      "id": 42,
+      "scrappers": [
         {
-          "type":"GenericScrapper",
-          "root_urls":[
+          "type": "GenericScrapper",
+          "root_urls": [
             {
-              "url":"https://studia3.elka.pw.edu.pl/file/19Z/103A-INxxx-ISP-PIPR/lim",
-              "interface": {"name": "Studia3"},
-              "sub_paths":{
-                "Wykłady":"/laboratoria",
-                "Laboratoria":"/slajdy%20z%20wykladow/"
-              }
+              "url": "https://studia3.elka.pw.edu.pl/file/19Z/103A-INxxx-ISP-PIPR/lim",
+              "interface": {
+                "name": "Studia3"
+              },
+              "sub_paths": [
+                {
+                  "name": "laboratoria",
+                  "path": "/laboratoria",
+                  "is_file": "True"
+                },
+                {
+                  "name": "slajdy z wykladów",
+                  "path": "/slajdy%20z%20wykladow/"
+                },
+                {
+                  "name": "root",
+                  "path": "/"
+                }
+              ]
             }
           ]
         }
       ]
     },
     {
-      "id":3,
-      "scrappers":[
+      "id": 44,
+      "scrappers": [
         {
-          "type":"ApacheIndexesScrapper",
-          "root_urls":[
+          "type": "GenericScrapper",
+          "root_urls": [
             {
-              "url":"http://www.mini.pw.edu.pl/~strozyna/dydakt",
-              "interface": {"name":"HttpAuth",
-                  "options":{
-                    "username":"analizy",
-                    "password":"****"}},
-              "sub_paths":{
-                "Wykłady":"/mat2-wyk",
-                "Projekt":"/mat2-proj"
-              }
+              "interface": {
+                "name": "HttpAuth",
+                "options": {
+                  "username": "analizy",
+                  "password": "********"
+                }
+              },
+              "url": "http://www.mini.pw.edu.pl/~strozyna/dydakt/mat2%20-%20lab",
+              "sub_paths": [
+                {
+                  "name": "Laboratoria",
+                  "path": "/"
+                }
+              ]
             }
           ]
         }
