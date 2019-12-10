@@ -15,7 +15,7 @@ def get_usos_users(user_ids: list = None) -> list:
 
     # Column names
     columns = [
-        'id', 'fb_first_name', 'fb_last_name', 'nickname', 'gender',
+        'id', 'fb_first_name', 'fb_last_name', 'nickname', 'gender', 'subscriptions',
         'usos_first_name', 'usos_last_name', 'usos_id', 'usos_courses',
         'usos_token', 'usos_token_secret', 'locale', 'is_registered'
     ]

@@ -52,9 +52,13 @@ if __name__ == '__main__':
                 logger.debug('--> [%s] %s: %s -- %s', p.course_id, p.name, p.points, p.comment)
             logger.debug('Updating DB...')
             update_new_usos_points(new_points)
-            logger.debug('Sending notification...')
-            notifier = Notifier([u.id])
-            notifier.message_new_points(new_points)
+            if 'points_notifications' in u.subscriptions:
+                logger.debug('Sending notification...')
+                notifier = Notifier([u.id])
+                # notifier.message_new_points(new_points)
+            else:
+                logger.debug('User doesn\'t have `points_notifications` in subscriptions '
+                             'so no notification will be sent.')
         else:
             logger.debug('No new points.')
 

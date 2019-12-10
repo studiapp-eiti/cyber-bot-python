@@ -28,7 +28,7 @@ class User:
 
     def __init__(self, id_, fb_first_name, fb_last_name, nickname, gender, usos_id,
                  usos_first_name, usos_last_name, usos_token, usos_token_secret,
-                 usos_courses, locale, is_registered):
+                 usos_courses, subscriptions, locale, is_registered):
         """Constructs new User object.
 
         Check for environment variables is issued before attempt to get user OAuth session
@@ -42,6 +42,7 @@ class User:
         self.gender = gender
         self.usos_id = usos_id
         self.courses = usos_courses
+        self.subscriptions = subscriptions.split(';')
         self.locale = locale
         self.is_registered = is_registered
 
