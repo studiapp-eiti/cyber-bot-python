@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 
 
-class AuthenticationInterface:
+class AuthenticationInterface(ABC):
 
 
     @abstractmethod

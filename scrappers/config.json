@@ -34,24 +34,24 @@
       ]
     },
     {
-      "id": 33,
+      "id": 44,
       "scrappers": [
         {
           "type": "GenericScrapper",
           "root_urls": [
             {
-              "url": "https://studia3.elka.pw.edu.pl/file/19Z/103A-CBxxx-ISP-APRO1/priv",
               "interface": {
-                "name": "Studia3"
+                "name": "HttpAuth",
+                "options": {
+                  "username": "analizy",
+                  "password": "********"
+                }
               },
+              "url": "http://www.mini.pw.edu.pl/~strozyna/dydakt/mat2%20-%20lab",
               "sub_paths": [
                 {
-                  "name": "Wykłady",
-                  "path": "/"
-                },
-                {
                   "name": "Laboratoria",
-                  "path": "/laboratoria.html"
+                  "path": "/"
                 }
               ]
             }

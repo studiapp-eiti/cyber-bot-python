@@ -36,11 +36,13 @@ class GenericScrapper(Scrapper):
         if "interface" in url_obj:
             interface = url_obj["interface"]
             if len(interface) != 0:
-                i = self.get_auth_interface(interface["name"], self.subject_id)
-                i.append_GET_parameters(request_parameters)
+                i = self.get_auth_interface(interface, self.subject_id)
+                request_parameters = i.append_GET_parameters(request_parameters)
 
         for path_obj in url_obj["sub_paths"]:
             parameters = request_parameters.copy()
             result = requests.get(base_url + path_obj["path"], **parameters)
+            if result.status_code != 200:
+                raise ConnectionError("Unable to connect: "+str(result.status_code))
             responses[(path_obj["path"], path_obj["name"])] = result.text
         return responses

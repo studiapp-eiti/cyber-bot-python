@@ -32,4 +32,4 @@ class Studia3Interface(AuthenticationInterface):
         cookies["STUDIA_SID"] = self.cookie_session_id
         existing_parameters["cookies"] = cookies
 
-        return dict(params=existing_parameters)
+        return existing_parameters
