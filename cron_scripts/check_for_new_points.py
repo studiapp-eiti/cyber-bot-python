@@ -17,7 +17,7 @@ file_handler = logging.FileHandler('./check_for_new_points.log')
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(file_formatter)
 
-stream_formatter = logging.Formatter('[DEBUG] %(message)s')
+stream_formatter = logging.Formatter('[%(levelname)s] %(message)s')
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.DEBUG)
 stream_handler.setFormatter(stream_formatter)

@@ -3,3 +3,4 @@ venv
 studia3/__pycache__
 config.py
 .env
+*.log
