@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 file_formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-file_handler = logging.FileHandler('./check_for_new_points.log')
+file_handler = logging.FileHandler(Path(__file__).parent / 'check_for_new_points.log')
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(file_formatter)
 

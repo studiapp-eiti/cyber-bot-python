@@ -1,5 +1,5 @@
 import sys
-import pathlib
+from pathlib import Path
 import logging
 from dotenv import load_dotenv
 from db.db_connector import DbConnector
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 file_formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-file_handler = logging.FileHandler('./init_new_usos_user.log')
+file_handler = logging.FileHandler(Path(__file__).parent / 'init_new_usos_user.log')
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(file_formatter)
 
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     logger.info('Started script with UIDs: %s', ', '.join([str(x) for x in args.user_ids]))
 
     # Load .env
-    env_path = pathlib.Path(__file__).parents[1] / '.env'
+    env_path = Path(__file__).parents[1] / '.env'
     load_dotenv(dotenv_path=env_path)
 
     # Get users from DB
