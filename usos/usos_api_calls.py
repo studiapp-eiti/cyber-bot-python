@@ -1,3 +1,5 @@
+from datetime import date, datetime, timedelta
+
 from usos.objects.course import Course
 from usos.objects.points import Points
 from usos.objects.program import Program
@@ -116,9 +118,16 @@ def get_timetable_for_tommorow(user: User):
     :param user: User that has an active session
     :returns: User's timetable for tommorow
     """
-    # TODO: Make timetable class and return it
-    r = user.api_post(BASE_URL + TIMETABLE_URL, data={'days': 4})
-    return r.json()
+    tomorrow = date.today() + timedelta(days=1)
+
+    r = user.api_post(BASE_URL + TIMETABLE_URL, data={
+        'start': tomorrow.strftime('%Y-%m-%d'),
+        'days': 1
+    })
+
+    for course in r.json():
+        t = datetime.fromisoformat(course['start_time'])
+        print('{}: {}'.format(t.strftime('%H:%M'), course['name'][user.locale]))
 
 
 def get_user_usos_id_and_name(user: User) -> dict:

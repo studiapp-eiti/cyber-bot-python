@@ -2,11 +2,29 @@ import os
 import rauth
 from time import sleep
 
+import requests
+
 
 def api_req(req):
     def catch_errors(*args, **kwargs):
-        sleep(0.25)  # Sleep for 250ms before issuing each request so USOS won't drop it
-        r = req(*args, **kwargs)
+        retries = int(os.getenv('REQUESTS_MAX_RETRIES'))
+        retry_timeout = float(os.getenv('REQUESTS_RETRY_TIMEOUT'))
+
+        error = True
+        r = None
+        while error and retries != 0:
+            try:
+                r = req(*args, **kwargs)
+                error = False
+            except requests.ConnectionError as conn_err:
+                sleep(retry_timeout)
+                retries -= 1
+                print('Connection error occured:', conn_err)
+                print('Remaining retries:', retries)
+
+        if r is None:
+            raise RuntimeError('Connection retries exceeded its maximum')
+
         if r.status_code == 400:
             raise RuntimeError('HTTP 400 Bad Request for: {}\nResponse message: {}'.format(r.url, r.json()['message']))
         elif r.status_code == 401:
