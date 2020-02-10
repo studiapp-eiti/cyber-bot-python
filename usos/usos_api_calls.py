@@ -110,11 +110,11 @@ def get_user_points(user: User) -> set:
     return user_points
 
 
-def get_timetable_for_tommorow(user: User):
-    """Get timetable for tommorow for specified user
+def get_timetable_for_tomorrow(user: User):
+    """Get timetable for tomorrow for specified user
 
     :param user: User that has an active session
-    :returns: User's timetable for tommorow
+    :returns: User's timetable for tomorrow
     """
     # TODO: Make timetable class and return it
     r = user.api_post(BASE_URL + TIMETABLE_URL, data={'days': 4})
