@@ -3,7 +3,7 @@ import mysql.connector
 
 
 def db_operation(op):
-    """Decorator function for automatically commiting DB transactions or issuing a rollback if something goes wrong"""
+    """Decorator function for automatically committing DB transactions or issuing a rollback if something goes wrong"""
     def dbop_wrapper(*args, **kwargs):
         ret = None
         try:
@@ -11,6 +11,7 @@ def db_operation(op):
             DbConnector.get_connection().commit()
         except mysql.connector.Error:
             DbConnector.get_connection().rollback()
+            # TODO: Raise RuntimeError and add logging
         return ret
     return dbop_wrapper
 
@@ -41,7 +42,7 @@ class _DbConnection:
 
 
 class DbConnector:
-    """Implements singletone behavior for `_DbConnection`"""
+    """Implements singleton behavior for `_DbConnection`"""
     _CONNECTION = None
 
     @classmethod
