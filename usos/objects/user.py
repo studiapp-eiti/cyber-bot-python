@@ -1,18 +1,46 @@
+import json
 import os
 import rauth
+import requests
+from time import sleep
 
 
 def api_req(req):
-    def catch_errors(*args, **kwargs):
-        r = req(*args, **kwargs)
-        if r.status_code == 400:
-            raise RuntimeError('HTTP 400 Bad Request for: {}\nResponse message: {}'.format(r.url, r.json()['message']))
-        elif r.status_code == 401:
-            raise RuntimeError('HTTP 401 Unauthorized for: {}\nResponse message: {}'.format(r.url, r.json()['message']))
-        elif r.status_code == 500:
-            raise RuntimeError('HTTP 500 Internal Server Error for: {}\nResponse: {}'.format(r.url, r.text))
-        return r
-    return catch_errors
+    """Decorator function for catching HTTP errors during request to USOS API
+    and when they occur - providing detailed information about them"""
+    def request_wrapper(*args, **kwargs):
+        # TODO: Add error logging
+        retries = int(os.getenv('REQUESTS_MAX_RETRIES'))
+        retry_timeout = float(os.getenv('REQUESTS_RETRY_TIMEOUT'))
+
+        error = True
+        response = None
+        while error and retries != 0:
+            try:
+                response = req(*args, **kwargs)
+                error = False
+            except requests.ConnectionError as conn_err:
+                sleep(retry_timeout)
+                retries -= 1
+                print('Connection error occurred:', conn_err)
+                print('Remaining retries:', retries)
+
+        if response is None:
+            raise RuntimeError('Connection retries exceeded its maximum')
+
+        if response.status_code >= 400:
+            error_msg = 'HTTP {res.status_code} error for request: {res.url}'\
+                        '\nResponse message: {res.text}'\
+                        '\nCaller: {user.usos_first_name} {user.usos_last_name} [{user.usos_id}]'\
+                        '\nRequest data:\n'.format(res=response, user=args[0])
+            # Note: args[0] holds User object that called this decorator
+
+            if 'data' in kwargs.keys() and type(kwargs['data']) == dict:
+                error_msg += json.dumps(kwargs['data'], ensure_ascii=False, indent=2)
+
+            raise RuntimeError(error_msg)
+        return response
+    return request_wrapper
 
 
 class User:
@@ -79,10 +107,10 @@ class User:
 
     @api_req
     def api_post(self, url, *args, **kwargs):
-        """Wrapper aroud session.post()"""
+        """Wrapper around session.post()"""
         return self.session.post(url, *args, **kwargs)
 
     @api_req
     def api_get(self, url, **kwargs):
-        """Wrapper aroud session.get()"""
+        """Wrapper around session.get()"""
         return self.session.get(url, **kwargs)
