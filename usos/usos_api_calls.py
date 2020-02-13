@@ -1,6 +1,9 @@
+from datetime import date, timedelta
+
 from usos.objects.course import Course
 from usos.objects.points import Points
 from usos.objects.program import Program
+from usos.objects.timetable import Timetable
 from usos.objects.user import User
 from usos.objects.node import Node
 
@@ -116,9 +119,22 @@ def get_timetable_for_tomorrow(user: User):
     :param user: User that has an active session
     :returns: User's timetable for tomorrow
     """
-    # TODO: Make timetable class and return it
-    r = user.api_post(BASE_URL + TIMETABLE_URL, data={'days': 4})
-    return r.json()
+    tomorrow = date.today() + timedelta(days=1)
+    fields = [
+        'start_time', 'end_time', 'room_number',
+        'course_name', 'classtype_name'
+    ]
+
+    # Note: fields 'room_number', 'course_name' and 'classtype_name' might cause the program to break
+    # because USOS API throws HTTP 500 error when the fields don't match the 'type' specific fields
+
+    r = user.api_post(BASE_URL + TIMETABLE_URL, data={
+        'start': tomorrow.strftime('%Y-%m-%d'),
+        'days': 1,
+        'fields': '|'.join(fields)
+    })
+
+    return Timetable(r.json())
 
 
 def get_user_usos_id_and_name(user: User) -> dict:
