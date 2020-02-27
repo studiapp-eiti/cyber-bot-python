@@ -9,14 +9,15 @@ from studia3.studia3_mysql import queries
 from studia3.studia_requests import Studia3Client
 
 import messenger
-import pathlib
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-file_handler = logging.FileHandler('/var/log/cyber_bot/refresh_session_1.log')
-file_handler = logging.FileHandler('/var/www/python/1.ss')
+formatter = logging.Formatter('%(asctime)s:%(module)s:%(levelname)s:%(message)s')
+# file_handler = logging.FileHandler('/var/log/cyber_bot/refresh_session_1.log')
+# file_handler = logging.FileHandler('/var/www/python/1.ss')
+file_handler = logging.FileHandler('dev_refresh_session.log')
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
 
@@ -28,7 +29,11 @@ logger.addHandler(file_handler)
 logger.addHandler(streamHandler)
 
 if __name__ == "__main__":
-    p = pathlib.Path(__file__).parents[1] / ".env"
+    p = Path(__file__).parents[1] / ".env"
+    # print(p)
+    # p = Path(__file__).parents[0]
+
+    # print(p)
     load_dotenv(dotenv_path=p)
     queries = queries.Queries.get_instance()
     maintainers = queries.carry_transaction(queries.get_cookies, False)

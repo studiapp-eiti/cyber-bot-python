@@ -1,5 +1,6 @@
 from . import generic_scrapper, apache_scrapper, base_scrapper
 
+
 class ScrapperCreator:
     SCRAPPERS = {"GenericScrapper": generic_scrapper.GenericScrapper,
                  "ApacheIndexesScrapper": apache_scrapper.ApacheIndexesScrapper}
@@ -9,11 +10,11 @@ class ScrapperCreator:
         try:
             return cls.SCRAPPERS[scrapper_name]
         except KeyError as e:
-            raise ValueError("Provided not correct scrappers name") from e
+            raise ValueError("Incorrect scrapper name provided!") from e
 
     @classmethod
     def from_json(cls, data: dict, subject_id: int) -> base_scrapper.Scrapper:
-        s_type = data["type"]
+        scrapper_type = data["type"]
         root_urls = data["root_urls"]
-        scrapper_class = cls.determine_scrapper(s_type)
+        scrapper_class = cls.determine_scrapper(scrapper_type)
         return scrapper_class(subject_id, root_urls)

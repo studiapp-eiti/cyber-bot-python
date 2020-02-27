@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from interfaces import interface_creator
 from interfaces import base_interface
 
+
 class Scrapper(ABC):
     DEFAULT_FILE_REGEX = "([^\"]+\\.(pdf|png|jpg|jpeg|doc|docx|xls|xlsx|txt|java|zip|tar|rar|tar.gz))"
 
@@ -28,8 +29,6 @@ class Scrapper(ABC):
             responses = self.scrap_url(url)
             self.data[url["url"]] = responses
 
-
     @abstractmethod
     def scrap_url(self, url_obj):
         pass
-

@@ -7,27 +7,39 @@
       "scrappers": [
         {
           "type": "GenericScrapper",
-          "root_urls": [
+          "root_url": "https://studia3.elka.pw.edu.pl/file/19Z/103A-INxxx-ISP-PIPR/lim",
+          "sub_urls": {
+            "Main": "/",
+            "Laboratories": "/laboratoria",
+            "Lectures": "/slajdy%20z%20wykladow"
+          },
+          "additional_files": {
+            "Principles": "/pryncypia/index.html"
+          },
+          "interfaces": [
             {
-              "url": "https://studia3.elka.pw.edu.pl/file/19Z/103A-INxxx-ISP-PIPR/lim",
-              "interface": {
-                "name": "Studia3"
-              },
-              "sub_paths": [
-                {
-                  "name": "laboratoria",
-                  "path": "/laboratoria",
-                  "is_file": "True"
-                },
-                {
-                  "name": "slajdy z wykladów",
-                  "path": "/slajdy%20z%20wykladow/"
-                },
-                {
-                  "name": "root",
-                  "path": "/"
-                }
-              ]
+              "name": "Studia3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "scrappers": [
+        {
+          "type": "GenericScrapper",
+          "root_url": "https://studia3.elka.pw.edu.pl/f-en/20L/103C-INxxx-ISP-ARKO/priv",
+          "sub_urls": {
+            "Main": "/",
+            "Actual": "/Aktualne",
+            "Laboratories": "/Lab",
+            "Projects": "/Projekty",
+            "Lectures": "/Wyklad"
+          },
+          "interfaces": [
+            {
+              "name": "Studia3"
             }
           ]
         }
