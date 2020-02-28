@@ -15,6 +15,5 @@ class ScrapperCreator:
     @classmethod
     def from_json(cls, data: dict, subject_id: int) -> base_scrapper.Scrapper:
         scrapper_type = data["type"]
-        root_urls = data["root_urls"]
         scrapper_class = cls.determine_scrapper(scrapper_type)
-        return scrapper_class(subject_id, root_urls)
+        return scrapper_class(subject_id, data)

@@ -9,40 +9,29 @@ from scrappers.base_scrapper import Scrapper
 class GenericScrapper(Scrapper):
     TIMEOUT = 5
 
-    #TODO Add support for include regex and exclude regex
-    def __init__(self, subject_id, root_urls, *args, **kwargs):
+    # TODO Add support for include regex and exclude regex
+    def __init__(self, subject_id, scrapper_data, *args, **kwargs):
+        super().__init__(scrapper_data, subject_id)
         self.subject_id = subject_id
-        self.root_urls = root_urls
-        self.data = dict()
+        self.scrapped_data = dict()
 
     def iter_urls(self):
-        for url in self.root_urls:
-            htmls = self.request_data(url)
-            data = self.scrap_url(htmls)
-            self.data[url["url"]] = data
+        root_url = self.scrapper_data["root_url"]
+        for url_name, url in self.scrapper_data["sub_urls"].keys():
+            raw_html = self.request_data(root_url + url)
+            self.scrapped_data[url_name] = self.scrap_url(raw_html)
 
     def scrap_url(self, html_data):
-        data = dict()
-        for url in html_data:
-            matches = re.findall('"' + Scrapper.DEFAULT_FILE_REGEX + '"', html_data[url], re.IGNORECASE)
-            data[url[1]] = [html.unescape(x[0]) for x in matches]
+        matches = re.findall('"' + Scrapper.DEFAULT_FILE_REGEX + '"', html_data, re.IGNORECASE)
+        data = [html.unescape(x) for x in matches]
         return data
 
-    def request_data(self, url_obj):
-        base_url = url_obj["url"]
+    def request_data(self, url):
         request_parameters = {"timeout": self.TIMEOUT}
-        responses = dict()
+        for interface in self.interfaces:
+            request_parameters = interface.append_GET_parameters(request_parameters)
 
-        if "interface" in url_obj:
-            interface = url_obj["interface"]
-            if len(interface) != 0:
-                i = self.get_auth_interface(interface, self.subject_id)
-                request_parameters = i.append_GET_parameters(request_parameters)
-
-        for path_obj in url_obj["sub_paths"]:
-            parameters = request_parameters.copy()
-            result = requests.get(base_url + path_obj["path"], **parameters)
-            if result.status_code != 200:
-                raise ConnectionError("Unable to connect: "+str(result.status_code))
-            responses[(path_obj["path"], path_obj["name"])] = result.text
-        return responses
+        response = requests.get(url, **request_parameters)
+        if response.status_code != 200:
+            raise ConnectionError("Unable to connect: " + str(response.status_code))
+        return response.text
