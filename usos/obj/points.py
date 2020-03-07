@@ -4,7 +4,12 @@ from datetime import datetime
 class Points:
     """Class for holding information about points scored by user in a certain test"""
 
-    def __init__(self, name, points, last_changed, comment, grader_id, node_id, student_id, course_id):
+    def __init__(self, name: str, points: float, last_changed, comment: str, grader_id: str, node_id: str,
+                 student_id: str, course_id: str):
+        """Initialize class members
+
+        :type last_changed: datetime, str
+        """
         self.name = name
         self.points = points
         if type(last_changed) == datetime:
