@@ -26,7 +26,7 @@ if __name__ == '__main__':
     env_path = Path(__file__).parents[1] / '.env'
     load_dotenv(dotenv_path=env_path)
 
-    logger.gen().info('Started script with UIDs: %s', ', '.join([str(x) for x in args.user_ids]))
+    logger.gen().info('Started init new usos user script with UIDs: %s', ', '.join([str(x) for x in args.user_ids]))
 
     # Get users from DB
     users = get_usos_users(args.user_ids)
