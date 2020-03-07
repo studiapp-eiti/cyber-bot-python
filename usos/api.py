@@ -3,7 +3,7 @@ import time
 import json
 import requests
 
-from usos.obj.user import User
+import usos.obj.user
 from usos.log import UsosLogger as logger
 
 
@@ -38,7 +38,7 @@ def _api_req(req):
                         '\nResponse message: {res.text}'.format(res=response)
 
             # Note: args[1] holds User object that called this decorator (if this is not an anon API request)
-            if type(args[1]) is User:
+            if type(args[1]) is usos.obj.user.User:
                 error_msg += '\nCaller: {u.usos_first_name} {u.usos_last_name} [{u.usos_id}]'.format(u=args[1])
 
             error_msg += '\nRequest data:\n'
@@ -103,10 +103,10 @@ class UsosApi:
 
     @classmethod
     @_api_req
-    def user_get(cls, user: User, url: str, *args, **kwargs):
+    def user_get(cls, user, url: str, *args, **kwargs):
         return user.session.get(url, *args, **kwargs)
 
     @classmethod
     @_api_req
-    def user_post(cls, user: User, url: str, *args, **kwargs):
+    def user_post(cls, user, url: str, *args, **kwargs):
         return user.session.post(url, *args, **kwargs)
