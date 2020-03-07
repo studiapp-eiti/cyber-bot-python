@@ -23,15 +23,15 @@ USER_POINTS_URL = 'services/crstests/user_points'
 USER_URL = 'services/users/user'
 
 
-def get_active_terms_ids(user: User) -> list:
-    """Gets active term ID
+def get_user_terms_ids(user: User) -> list:
+    """Gets term IDs in which the user took part
 
     :param user: User that has an active session
-    :returns: A list with active term IDs
+    :returns: A list of term IDs
     """
     r = api.user_post(user, BASE_URL + USER_COURSES_URL, data={
         'fields': 'terms',
-        'active_terms_only': 'true'
+        'active_terms_only': 'false'
     })
 
     return [term['id'] for term in r.json()['terms']]
@@ -75,24 +75,33 @@ def get_user_courses(user: User) -> set:
     })
 
     courses = set()
-    for term in get_active_terms_ids(user):
+    for term in get_user_terms_ids(user):
         for course in r.json()['groups'][term]:
             courses.add(Course.from_json(course))
 
     return courses
 
 
-def get_user_points(user: User) -> set:
+def get_user_points(user: User, current_term_only: bool = True) -> set:
     """Get all points that user has scored in all courses
 
     :param user: User that has an active session
+    :param current_term_only: Get points only scored during current semester
     :returns: Set of all points scored by user
     """
     r = api.user_get(user, BASE_URL + TEST_PARTICIPANT_URL)
     user_points = set()
 
-    for term in get_active_terms_ids(user):
-        if term not in r.json()['tests']:
+    terms = []
+    if current_term_only:
+        terms.append(get_global_term_id())
+    else:
+        terms.extend(get_user_terms_ids(user))
+
+    terms_from_api = r.json()['tests']
+
+    for term in terms:
+        if term not in terms_from_api:
             continue
 
         for root_id, root_content in r.json()['tests'][term].items():
