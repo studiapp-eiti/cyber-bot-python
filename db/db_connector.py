@@ -1,6 +1,8 @@
 from os import getenv
 import mysql.connector
 
+from usos.log import UsosLogger
+
 
 def db_operation(op):
     """Decorator function for automatically committing DB transactions or issuing a rollback if something goes wrong"""
@@ -12,6 +14,24 @@ def db_operation(op):
         except mysql.connector.Error:
             DbConnector.get_connection().rollback()
             # TODO: Raise RuntimeError and add logging
+        return ret
+    return dbop_wrapper
+
+
+def db_operation_usos(op):
+    """Same as `db_operation()` but specifically designed to USOS module for performing log operations during
+    database operations"""
+    def dbop_wrapper(*args, **kwargs):
+        try:
+            UsosLogger.db().debug('Trying to execute query...')
+            ret = op(*args, **kwargs)
+            DbConnector.get_connection().commit()
+            UsosLogger.db().debug('Query executed successfully')
+        except mysql.connector.Error as err:
+            DbConnector.get_connection().rollback()
+            err_msg = 'MySQL error occurred: {}'.format(err)
+            UsosLogger.db().exception(err_msg)
+            raise RuntimeError(err_msg)
         return ret
     return dbop_wrapper
 

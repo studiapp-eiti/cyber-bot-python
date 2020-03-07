@@ -1,5 +1,5 @@
-from db.db_connector import DbConnector, db_operation
-from usos.objects.user import User
+from db.db_connector import DbConnector, db_operation_usos
+from usos.obj.user import User
 
 
 def update_usos_courses(courses: set):
@@ -42,7 +42,7 @@ def update_usos_programs(programs: set):
         ))
 
 
-@db_operation
+@db_operation_usos
 def update_new_usos_points(points: set):
     """Insert new points into `usos_points` table
 
