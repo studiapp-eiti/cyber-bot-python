@@ -1,7 +1,7 @@
 from os import getenv
 import mysql.connector
 
-from usos.log import UsosLogger
+from logger.log import Log
 
 
 def db_operation(op):
@@ -23,14 +23,14 @@ def db_operation_usos(op):
     database operations"""
     def dbop_wrapper(*args, **kwargs):
         try:
-            UsosLogger.db().debug('Trying to execute query...')
+            Log.u_db().debug('Trying to execute query...')
             ret = op(*args, **kwargs)
             DbConnector.get_connection().commit()
-            UsosLogger.db().debug('Query executed successfully')
+            Log.u_db().debug('Query executed successfully')
         except mysql.connector.Error as err:
             DbConnector.get_connection().rollback()
             err_msg = 'MySQL error occurred: {}'.format(err)
-            UsosLogger.db().exception(err_msg)
+            Log.u_db().exception(err_msg)
             raise RuntimeError(err_msg)
         return ret
     return dbop_wrapper

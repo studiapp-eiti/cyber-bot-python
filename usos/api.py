@@ -4,7 +4,7 @@ import json
 import requests
 
 import usos.obj.user
-from usos.log import UsosLogger as logger
+from logger.log import Log
 
 
 def _api_req(req):
@@ -12,7 +12,7 @@ def _api_req(req):
     and when they occur - providing detailed information about them"""
 
     def request_wrapper(*args, **kwargs):
-        logger.api().debug('Issuing API request...')
+        Log.u_api().debug('Issuing API request...')
 
         retries = int(os.getenv('REQUESTS_MAX_RETRIES'))
         retry_timeout = float(os.getenv('REQUESTS_RETRY_TIMEOUT'))
@@ -24,13 +24,13 @@ def _api_req(req):
                 response = req(*args, **kwargs)
                 error = False
             except requests.ConnectionError as conn_err:
-                logger.api().exception('Connection error occurred: %s\nRemaining retries: %d', conn_err, retries)
+                Log.u_api().exception('Connection error occurred: %s\nRemaining retries: %d', conn_err, retries)
                 time.sleep(retry_timeout)
                 retries -= 1
 
         if response is None:
             err_msg = 'Connection retries exceeded its maximum'
-            logger.api().error(err_msg)
+            Log.u_api().error(err_msg)
             raise RuntimeError(err_msg)
 
         if response.status_code != 200:
@@ -45,10 +45,10 @@ def _api_req(req):
             if 'data' in kwargs.keys() and type(kwargs['data']) == dict:
                 error_msg += json.dumps(kwargs['data'], ensure_ascii=False, indent=2)
 
-            logger.api().error(error_msg)
+            Log.u_api().error(error_msg)
             raise RuntimeError(error_msg)
 
-        logger.api().debug('API request successful')
+        Log.u_api().debug('API request successful')
         return response
 
     return request_wrapper
@@ -66,7 +66,7 @@ class _UsosApiConsumer:
         if os.getenv(_UsosApiConsumer.CONSUMER_KEY_VARNAME) is None \
                 or os.getenv(_UsosApiConsumer.CONSUMER_SECRET_VARNAME) is None:
             err_msg = 'USOS API consumer key and secret variables not found in system environment.'
-            logger.api().critical(err_msg)
+            Log.u_api().critical(err_msg)
             raise OSError(err_msg)
 
         self.consumer_key = os.getenv(_UsosApiConsumer.CONSUMER_KEY_VARNAME)
