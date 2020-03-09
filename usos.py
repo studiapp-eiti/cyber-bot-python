@@ -21,4 +21,4 @@ if __name__ == '__main__':
 
             print('Activities:')
             for a in tt.activities:
-                print('-> from {} to {} - {} [{}] in {}'.format(a.start.str, a.end_str, a.name_pl, a.type_pl, a.room))
+                print('-> from {} to {} - {} [{}] in {}'.format(a.start_str, a.end_str, a.short_course_id, a.type_pl, a.room))

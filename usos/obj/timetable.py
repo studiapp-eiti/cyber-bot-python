@@ -60,7 +60,7 @@ class Gap:
     def __init__(self, start: datetime, end: datetime):
         self.start = start
         self.end = end
-        self.duration = (end - start).total_seconds()
+        self.duration = (end - start).total_seconds() // 60
 
     @property
     def start_str(self):
@@ -75,9 +75,9 @@ class Gap:
         hours = ''
         minutes = ''
         if self.duration >= 60:
-            hours = '{}h'.format(self.duration // 60)
+            hours = '{}h'.format(int(self.duration // 60))
         if self.duration % 60 != 0:
-            minutes = '{}min'.format(self.duration % 60)
+            minutes = '{}min'.format(int(self.duration % 60))
 
         separator = ' ' if len(hours) != 0 and len(minutes) != 0 else ''
 

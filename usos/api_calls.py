@@ -142,10 +142,10 @@ def get_timetable_for_tomorrow(user: User):
     tomorrow = date.today() + timedelta(days=1)
     fields = [
         'start_time', 'end_time', 'room_number',
-        'course_name', 'classtype_name'
+        'course_name', 'classtype_name', 'course_id'
     ]
 
-    # Note: fields 'room_number', 'course_name' and 'classtype_name' might cause the program to break
+    # Note: fields 'course_id', 'room_number', 'course_name' and 'classtype_name' might cause the program to break
     # because USOS API throws HTTP 500 error when the fields don't match the 'type' specific fields
 
     r = api.user_post(user, BASE_URL + TIMETABLE_URL, data={
