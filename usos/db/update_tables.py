@@ -1,4 +1,4 @@
-from db.db_connector import DbConnector, db_operation_usos
+from db.db_connector import DbConnector, db_safe_transaction
 from usos.obj.user import User
 
 
@@ -42,7 +42,7 @@ def update_usos_programs(programs: set):
         ))
 
 
-@db_operation_usos
+@db_safe_transaction('usos')
 def update_new_usos_points(points: set):
     """Insert new points into `usos_points` table
 
@@ -83,7 +83,7 @@ def update_new_usos_points(points: set):
     cursor.close()
 
 
-@db_operation_usos
+@db_safe_transaction('usos')
 def update_modified_usos_points(points: set, user: User):
     """Update `usos_points` table with new points, comment and last changed time
 
@@ -101,7 +101,7 @@ def update_modified_usos_points(points: set, user: User):
     cursor.close()
 
 
-@db_operation_usos
+@db_safe_transaction('usos')
 def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey, obj_to_tuple):
     """Generic function to update tables in database
 

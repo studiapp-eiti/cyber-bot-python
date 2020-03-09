@@ -1,10 +1,10 @@
-from db.db_connector import DbConnector, db_operation_usos
+from db.db_connector import DbConnector, db_safe_transaction
 from usos.obj.points import Points
 from usos.obj.user import User
 from usos.api_calls import get_user_points
 
 
-@db_operation_usos
+@db_safe_transaction('usos')
 def get_usos_users(user_ids: list = None) -> list:
     """Get all users from DB and convert to User objects
 
@@ -41,7 +41,7 @@ def get_usos_users(user_ids: list = None) -> list:
     return users
 
 
-@db_operation_usos
+@db_safe_transaction('usos')
 def get_new_and_modified_points(user: User) -> tuple:
     """Get all points scored by given user and return new and modified ones
 
