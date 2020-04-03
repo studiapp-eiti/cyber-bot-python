@@ -1,5 +1,5 @@
-from db.db_connector import DbConnector, db_operation
-from usos.objects.user import User
+from db.db_connector import DbConnector, db_safe_transaction
+from usos.obj.user import User
 
 
 def update_usos_courses(courses: set):
@@ -42,7 +42,7 @@ def update_usos_programs(programs: set):
         ))
 
 
-@db_operation
+@db_safe_transaction('usos')
 def update_new_usos_points(points: set):
     """Insert new points into `usos_points` table
 
@@ -83,7 +83,7 @@ def update_new_usos_points(points: set):
     cursor.close()
 
 
-@db_operation
+@db_safe_transaction('usos')
 def update_modified_usos_points(points: set, user: User):
     """Update `usos_points` table with new points, comment and last changed time
 
@@ -101,7 +101,7 @@ def update_modified_usos_points(points: set, user: User):
     cursor.close()
 
 
-@db_operation
+@db_safe_transaction('usos')
 def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey, obj_to_tuple):
     """Generic function to update tables in database
 
@@ -109,7 +109,7 @@ def generic_update_table(objects: set, table_name: str, columns: list, obj_pkey,
 
     :param objects: Objects to be inserted
     :param table_name: Table name that we want to insert records
-    :param columns: List of columns we want to instert. First element should be primary key column name
+    :param columns: List of columns we want to insert. First element should be primary key column name
     :param obj_pkey: Function that extracts primary key (unique) attribute from object
     For example: lambda x: x.some_primary_key_attribute
     :type obj_pkey: function

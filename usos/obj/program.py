@@ -1,18 +1,18 @@
 class Program:
     """Class representing user program (or programme if you speak british english)"""
 
-    def __init__(self, program_id, program_name_pl, program_name_en):
+    def __init__(self, program_id: str, program_name_pl: str, program_name_en: str):
         """Constructs a new Program object"""
         self.program_id = program_id
         self.program_name_pl = program_name_pl
         self.program_name_en = program_name_en
 
     @property
-    def short_program_name_pl(self):
+    def short_program_name_pl(self) -> str:
         return self.program_name_pl.split(',')[0]
 
     @property
-    def short_program_name_en(self):
+    def short_program_name_en(self) -> str:
         return self.program_name_en.split(',')[0]
 
     @classmethod

@@ -1,8 +1,11 @@
 class Node:
     """Class providing convenient interface to interact with USOS API course test node tree"""
 
-    def __init__(self, node_id, parent_node, name, node_type):
-        """Constructs new Node object"""
+    def __init__(self, node_id: str, parent_node, name: str, node_type: str):
+        """Constructs new Node object
+
+        :type parent_node: Node, NoneType
+        """
         self.node_id = node_id
         self.parent_node = parent_node
         self.name = name

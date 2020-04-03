@@ -1,10 +1,13 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
-from usos.objects.course import Course
-from usos.objects.points import Points
-from usos.objects.program import Program
-from usos.objects.user import User
-from usos.objects.node import Node
+from usos.obj.course import Course
+from usos.obj.points import Points
+from usos.obj.program import Program
+from usos.obj.timetable import Timetable
+from usos.obj.user import User
+from usos.obj.node import Node
+
+from usos.api import UsosApi as api
 
 # URLs for USOS API methods
 BASE_URL = 'https://apps.usos.pw.edu.pl/'
@@ -12,6 +15,7 @@ TEST_PARTICIPANT_URL = 'services/crstests/participant'
 STUDENT_POINT_URL = 'services/crstests/student_point'
 NODE_URL = 'services/crstests/node'
 TIMETABLE_URL = 'services/tt/student'
+TERM_SEARCH = 'services/terms/search'
 USER_PROGRAMS_URL = 'services/progs/student'
 USER_COURSES_URL = 'services/courses/user'
 USER_COURSES_PARTICIPANT_URL = 'services/groups/participant'
@@ -19,18 +23,26 @@ USER_POINTS_URL = 'services/crstests/user_points'
 USER_URL = 'services/users/user'
 
 
-def get_active_terms_ids(user: User) -> list:
-    """Gets active term ID
+def get_user_terms_ids(user: User) -> list:
+    """Gets term IDs in which the user took part
 
     :param user: User that has an active session
-    :returns: A list with active term IDs
+    :returns: A list of term IDs
     """
-    r = user.api_post(BASE_URL + USER_COURSES_URL, data={
+    r = api.user_post(user, BASE_URL + USER_COURSES_URL, data={
         'fields': 'terms',
-        'active_terms_only': 'true'
+        'active_terms_only': 'false'
     })
 
     return [term['id'] for term in r.json()['terms']]
+
+
+def get_global_term_id() -> str:
+    """Gets global semester ID (independent of each user)"""
+    r = api.anon_get(BASE_URL + TERM_SEARCH, params={
+        'min_finish_date': date.today().strftime('%Y-%m-%d')
+    })
+    return r.json()[0]['id']
 
 
 def get_user_programs(user: User) -> set:
@@ -39,7 +51,7 @@ def get_user_programs(user: User) -> set:
     :param user: User that has an active session
     :returns: Set of unique Program objects representing user programs
     """
-    r = user.api_get(BASE_URL + USER_PROGRAMS_URL)
+    r = api.user_get(user, BASE_URL + USER_PROGRAMS_URL)
 
     programs = set()
     for program in r.json():
@@ -57,30 +69,39 @@ def get_user_courses(user: User) -> set:
     fields = [
         'course_id', 'course_name', 'term_id'
     ]
-    r = user.api_post(BASE_URL + USER_COURSES_PARTICIPANT_URL, data={
+    r = api.user_post(user, BASE_URL + USER_COURSES_PARTICIPANT_URL, data={
         'fields': '|'.join(fields),
         'active_terms': 'true'
     })
 
     courses = set()
-    for term in get_active_terms_ids(user):
+    for term in get_user_terms_ids(user):
         for course in r.json()['groups'][term]:
             courses.add(Course.from_json(course))
 
     return courses
 
 
-def get_user_points(user: User) -> set:
+def get_user_points(user: User, current_term_only: bool = True) -> set:
     """Get all points that user has scored in all courses
 
     :param user: User that has an active session
+    :param current_term_only: Get points only scored during current semester
     :returns: Set of all points scored by user
     """
-    r = user.api_get(BASE_URL + TEST_PARTICIPANT_URL)
+    r = api.user_get(user, BASE_URL + TEST_PARTICIPANT_URL)
     user_points = set()
 
-    for term in get_active_terms_ids(user):
-        if term not in r.json()['tests']:
+    terms = []
+    if current_term_only:
+        terms.append(get_global_term_id())
+    else:
+        terms.extend(get_user_terms_ids(user))
+
+    terms_from_api = r.json()['tests']
+
+    for term in terms:
+        if term not in terms_from_api:
             continue
 
         for root_id, root_content in r.json()['tests'][term].items():
@@ -88,7 +109,7 @@ def get_user_points(user: User) -> set:
                 'node_id', 'root_id', 'parent_id',
                 'name', 'type', 'subnodes'
             ]
-            r = user.api_post(BASE_URL + NODE_URL, data={
+            r = api.user_post(user, BASE_URL + NODE_URL, data={
                 'node_id': root_id,
                 'recursive': 'true',
                 'fields': '|'.join(fields)
@@ -97,7 +118,7 @@ def get_user_points(user: User) -> set:
             root_node = Node.from_json(r.json(), None)
             pkt_node_ids = [str(i) for i in Node.search_tree(root_node, lambda x: x.type == 'pkt', lambda x: x.node_id)]
 
-            r = user.api_post(BASE_URL + USER_POINTS_URL, data={
+            r = api.user_post(user, BASE_URL + USER_POINTS_URL, data={
                 'node_ids': '|'.join(pkt_node_ids)
             })
 
@@ -112,22 +133,28 @@ def get_user_points(user: User) -> set:
     return user_points
 
 
-def get_timetable_for_tommorow(user: User):
-    """Get timetable for tommorow for specified user
+def get_timetable_for_tomorrow(user: User):
+    """Get timetable for tomorrow for specified user
 
     :param user: User that has an active session
-    :returns: User's timetable for tommorow
+    :returns: User's timetable for tomorrow
     """
     tomorrow = date.today() + timedelta(days=1)
+    fields = [
+        'start_time', 'end_time', 'room_number',
+        'course_name', 'classtype_name', 'course_id'
+    ]
 
-    r = user.api_post(BASE_URL + TIMETABLE_URL, data={
+    # Note: fields 'course_id', 'room_number', 'course_name' and 'classtype_name' might cause the program to break
+    # because USOS API throws HTTP 500 error when the fields don't match the 'type' specific fields
+
+    r = api.user_post(user, BASE_URL + TIMETABLE_URL, data={
         'start': tomorrow.strftime('%Y-%m-%d'),
-        'days': 1
+        'days': 1,
+        'fields': '|'.join(fields)
     })
 
-    for course in r.json():
-        t = datetime.fromisoformat(course['start_time'])
-        print('{}: {}'.format(t.strftime('%H:%M'), course['name'][user.locale]))
+    return Timetable(r.json())
 
 
 def get_user_usos_id_and_name(user: User) -> dict:
@@ -139,7 +166,7 @@ def get_user_usos_id_and_name(user: User) -> dict:
     fields = [
         'id', 'first_name', 'last_name'
     ]
-    r = user.api_post(BASE_URL + USER_URL, data={
+    r = api.user_post(user, BASE_URL + USER_URL, data={
         'fields': '|'.join(fields)
     })
     return r.json()
